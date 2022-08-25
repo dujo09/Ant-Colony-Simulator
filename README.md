@@ -13,4 +13,5 @@ T - select place tool\
 P - increase brush size\
 L - decrease brush size\
 
+![AntColonySimulatorGitHubScreenshot](https://user-images.githubusercontent.com/105624444/186716132-dd2bbc8b-81b7-4109-b5b4-75bb74ed79af.jpg)
 
