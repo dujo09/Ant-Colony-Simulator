@@ -13,8 +13,8 @@ public class World {
     public static final int MAX_COLONY_COUNT = 3;
     public static final float MAX_PHEROMONE_INTENSITY = 100f;
 
-    public static final int COLUMN_COUNT = 400;
-    public static final int ROW_COUNT = 400;
+    public static final int COLUMN_COUNT = 200;
+    public static final int ROW_COUNT = 200;
     public static final float CELL_SIZE = 1;
 
     public static float PHEROMONE_DEGRADE_PERIOD = 5f;

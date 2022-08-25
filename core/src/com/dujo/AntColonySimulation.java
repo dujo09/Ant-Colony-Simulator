@@ -115,11 +115,11 @@ public class AntColonySimulation extends ApplicationAdapter {
 		if(Gdx.input.isKeyPressed(Input.Keys.E)){
 			camera.zoom += 0.03;
 		}
-		if(Gdx.input.isKeyPressed(Input.Keys.P)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
 			drawSettings.brushSize += 10f;
 			drawSettings.brushSize = MathUtils.clamp(drawSettings.brushSize, 5f, 100f);
 		}
-		if(Gdx.input.isKeyPressed(Input.Keys.L)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.L)){
 			drawSettings.brushSize -= 10f;
 			drawSettings.brushSize = MathUtils.clamp(drawSettings.brushSize, 5f, 100f);
 		}
