@@ -28,9 +28,6 @@ public class Ant {
     public static final float ROTATION_PERIOD = 0.25f;
     public static final float PHEROMONE_DROP_PERIOD = 0.25f;
     public static final float REPEL_PERIOD = 120f;
-    public static final float VITALITY_DROP_PERIOD = 10f;
-
-    public static final float MAX_VITALITY = 100f;
 
     public static final float DESIRE_TO_WANDER = 0.15f;
     final float CHANCE_TO_REPEL = 0.01f;
@@ -41,9 +38,7 @@ public class Ant {
     private Goal goal;
     private Pheromone pheromone;
     private float pheromoneIntensity;
-    private float vitality;
     private int foodHolding;
-    private final Cooldown vitalityDropCooldown;
     private final Cooldown rotationCooldown;
     private final Cooldown pheromoneDropCooldown;
     private final Cooldown repelCooldown;
@@ -62,9 +57,6 @@ public class Ant {
         pheromone = Pheromone.TO_COLONY;
         pheromoneIntensity = World.MAX_PHEROMONE_INTENSITY;
 
-        vitality = MAX_VITALITY;
-
-        vitalityDropCooldown = new Cooldown(VITALITY_DROP_PERIOD);
         rotationCooldown = new Cooldown(ROTATION_PERIOD);
         pheromoneDropCooldown = new Cooldown(PHEROMONE_DROP_PERIOD);
         repelCooldown = new Cooldown(REPEL_PERIOD);
@@ -91,32 +83,19 @@ public class Ant {
     }
 
     public void update(float deltaTime){
-        vitalityDropCooldown.update(deltaTime);
         rotationCooldown.update(deltaTime);
         pheromoneDropCooldown.update(deltaTime);
         repelCooldown.update(deltaTime);
-
-        if(vitalityDropCooldown.isReady()){
-            vitalityDropCooldown.reset();
-
-            vitality -= 1f;
-            if(vitality <= 0f){
-                // DIes
-            }
-            if(vitality < 0.75f * MAX_VITALITY){
-                goal = Goal.RETURN_TO_COLONY;
-                if(pheromone == Pheromone.TO_COLONY){
-                    pheromone = null;
-                }
-                direction.setCurrentVector(direction.getCurrentVectorOpposite());
-            }
-        }
 
         if(pheromoneDropCooldown.isReady() && pheromone != null){
             pheromoneDropCooldown.reset();
 
             world.setPheromone(position, pheromone, pheromoneIntensity, colony.getID());
             pheromoneIntensity -= 0.1f;
+            if(pheromoneIntensity == 0f){
+                goal = Goal.RETURN_TO_COLONY;
+                pheromone = null;
+            }
         }
 
         if(rotationCooldown.isReady()) {
