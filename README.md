@@ -13,4 +13,4 @@ T - select place tool\
 P - increase brush size\
 L - decrease brush size\
 
-![image](https://user-images.githubusercontent.com/105624444/186713030-c4299b60-690e-4cbb-8a7c-aa30c0981e4b.png)
+
