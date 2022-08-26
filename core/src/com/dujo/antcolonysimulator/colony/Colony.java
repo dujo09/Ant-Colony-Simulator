@@ -1,14 +1,10 @@
 package com.dujo.antcolonysimulator.colony;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.common.Cooldown;
 import com.dujo.antcolonysimulator.world.World;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +17,15 @@ public class Colony {
     public static final float ANT_CREATE_PERIOD = 2f;
     public static final int ANT_CREATE_COST = 100;
 
-    private int ID;
+    private final int index;
     private Point2D.Float position;
     private final List<Ant> ants;
     private int food;
     private final Cooldown antCreateCooldown;
     private final World world;
 
-    public Colony(int ID, Point2D.Float position, World world){
-        this.ID = ID;
+    public Colony(int index, Point2D.Float position, World world){
+        this.index = index;
 
         this.position = position;
 
@@ -51,8 +47,7 @@ public class Colony {
 
     }
 
-    public void updateAndDraw(float deltaTime, SpriteBatch batch,
-                              boolean drawAnts, boolean drawColony, TextureRegion[] textureRegions, Color color){
+    public void update(float deltaTime){
         antCreateCooldown.update(deltaTime);
 
         if(antCreateCooldown.isReady()){
@@ -61,15 +56,9 @@ public class Colony {
 
         for(Ant ant : ants){
             ant.update(deltaTime);
-            if(drawColony && drawAnts) {
-                ant.draw(batch, color, textureRegions[0], textureRegions[1]);
-            }
         }
-        if(drawColony) {
-            batch.setColor(color);
-            batch.draw(textureRegions[2], position.x - COLONY_SIZE / 2f, position.y - COLONY_SIZE / 2f, COLONY_SIZE, COLONY_SIZE);
-            batch.setColor(1f, 1f, 1f, 1f);
-        }
+
+        Gdx.app.log("Colony", "COLONY " + index + ": " + food + " FOOD | " + ants.size() + " ANTS");
     }
 
     private void createAnt(){
@@ -96,8 +85,8 @@ public class Colony {
         return ants;
     }
 
-    public int getID(){
-        return ID;
+    public int getIndex(){
+        return index;
     }
 
 }

@@ -12,3 +12,8 @@ R - select remove tool\
 T - select place tool\
 P - increase brush size\
 L - decrease brush size\
+1 2 3 - toggle colony visibility\
+4 5 6 - toggle pheromone type visibility\
+7 - toggle ant visibility\
+Mouse LEFT click - place food/wall\
+Mouse RIGHT click - place colony

@@ -25,12 +25,6 @@ public class Direction {
         targetAngle = targetVector.angleRad();
     }
 
-    /**
-     * Method for gradually rotating an Ant to its target angle
-     *
-     * @param deltaTime time since last frame
-     * @param rotateSpeed Ants rotate speed
-     */
     public void rotate(float deltaTime, float rotateSpeed){
         int moveDirection = 0;
         float currentAngleOpposite = getCurrentVectorOpposite().angleRad();

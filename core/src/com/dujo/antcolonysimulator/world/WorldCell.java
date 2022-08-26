@@ -1,14 +1,7 @@
 package com.dujo.antcolonysimulator.world;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.dujo.antcolonysimulator.ant.Pheromone;
-import sun.awt.windows.WPrinterJob;
-
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
 
 public class WorldCell {
     private final int row;
@@ -16,7 +9,7 @@ public class WorldCell {
     private boolean isWall;
     private int food;
     private final float[][] colonyPheromones;
-    private boolean isActive;
+    private boolean isEmpty;
 
     public WorldCell(int row, int column){
         this.row = row;
@@ -25,19 +18,17 @@ public class WorldCell {
         colonyPheromones = new float[World.MAX_COLONY_COUNT][Pheromone.values().length];
     }
 
-    void update(boolean[] coloniesToDraw){
-        isActive = false;
+    void update(){
+        isEmpty = true;
 
         if(food > 0 || isWall){
-            isActive = true;
+            isEmpty = false;
         }else{
             for(int i = 0; i < World.MAX_COLONY_COUNT; ++i){
-                if(coloniesToDraw[i]){
-                    for(int j = 0; j < Pheromone.values().length; ++j){
-                        if (colonyPheromones[i][j] > 0f) {
-                            isActive = true;
-                            break;
-                        }
+                for(int j = 0; j < Pheromone.values().length; ++j){
+                    if (colonyPheromones[i][j] > 0f) {
+                        isEmpty = false;
+                        break;
                     }
                 }
             }
@@ -53,16 +44,9 @@ public class WorldCell {
         return column;
     }
 
+    // Get pheromone of all given colonies
     public float getPheromoneOnCell(Pheromone pheromone, int colonyID){
         return colonyPheromones[colonyID][pheromone.ordinal()];
-    }
-
-    public float getPheromoneOnCell(Pheromone pheromone){
-        float intensity = 0f;
-        for(int i = 0; i < World.MAX_COLONY_COUNT; ++i){
-            intensity += colonyPheromones[i][pheromone.ordinal()];
-        }
-        return intensity;
     }
 
     public void setPheromoneOnCell(Pheromone pheromone, float intensity, int colonyID){
@@ -132,8 +116,8 @@ public class WorldCell {
         isWall = wall;
     }
 
-    boolean isActive(){
-        return isActive;
+    public boolean isEmpty(){
+        return isEmpty;
     }
 
 }

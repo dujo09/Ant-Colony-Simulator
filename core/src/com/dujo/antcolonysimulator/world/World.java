@@ -1,7 +1,5 @@
 package com.dujo.antcolonysimulator.world;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.dujo.antcolonysimulator.ant.Pheromone;
 import com.dujo.antcolonysimulator.colony.Colony;
@@ -12,12 +10,14 @@ import java.awt.geom.Point2D;
 public class World {
     public static final int MAX_COLONY_COUNT = 3;
     public static final float MAX_PHEROMONE_INTENSITY = 100f;
+    public static final float MAX_FOOD_ON_CELL = 100f;
 
-    public static final int COLUMN_COUNT = 200;
-    public static final int ROW_COUNT = 200;
+    public static final int COLUMN_COUNT = 400;
+    public static final int ROW_COUNT = 400;
     public static final float CELL_SIZE = 1;
 
     public static float PHEROMONE_DEGRADE_PERIOD = 5f;
+
     private final WorldCell[] cells;
     private final Cooldown pheromoneDegradeCooldown;
 
@@ -32,71 +32,20 @@ public class World {
 
             cells[i] = new WorldCell(row, column);
 
+            // Create wall border around whole world
             if(row == 0 || row == ROW_COUNT - 1 || column == 0 || column == COLUMN_COUNT - 1){
                 cells[i].setWall(true);
             }
         }
     }
 
-    public void updateAndDraw(float deltaTime, SpriteBatch batch,
-                              boolean drawToColonyPheromones, boolean drawToFoodPheromones, boolean drawRepellents,
-                              boolean[] coloniesToDraw, TextureRegion[] textureRegions){
+    public void update(float deltaTime){
         pheromoneDegradeCooldown.update(deltaTime);
 
         for(int i = 0; i < ROW_COUNT * COLUMN_COUNT; ++i){
-            cells[i].update(coloniesToDraw);
+            cells[i].update();
             if(pheromoneDegradeCooldown.isReady()){
                 cells[i].degradePheromone(0.99f);
-            }
-
-            if(cells[i].isActive()){
-                batch.setColor(1f, 1f, 1f, cells[i].getFoodOnCell() / 100f);
-                batch.draw(textureRegions[6], cells[i].getColumn() * CELL_SIZE, cells[i].getRow() * CELL_SIZE,
-                        CELL_SIZE, CELL_SIZE);
-                batch.setColor(1f, 1f, 1f, 1f);
-
-                if(cells[i].isWall()){
-                    batch.draw(textureRegions[7], cells[i].getColumn() * CELL_SIZE, cells[i].getRow() * CELL_SIZE,
-                            CELL_SIZE, CELL_SIZE);
-                }
-
-                if(drawToColonyPheromones) {
-                    float intensity = 0f;
-                    for(int j = 0; j < MAX_COLONY_COUNT; ++j){
-                        if(coloniesToDraw[j]){
-                            intensity += cells[i].getPheromoneOnCell(Pheromone.TO_COLONY, j);
-                        }
-                    }
-                    batch.setColor(1f, 1f, 1f, intensity / MAX_PHEROMONE_INTENSITY);
-                    batch.draw(textureRegions[3], cells[i].getColumn() * CELL_SIZE, cells[i].getRow() * CELL_SIZE,
-                            CELL_SIZE, CELL_SIZE);
-                }
-
-                if(drawToFoodPheromones) {
-                    float intensity = 0f;
-                    for(int j = 0; j < MAX_COLONY_COUNT; ++j){
-                        if(coloniesToDraw[j]){
-                            intensity += cells[i].getPheromoneOnCell(Pheromone.TO_FOOD, j);
-                        }
-                    }
-                    batch.setColor(1f, 1f, 1f, intensity / MAX_PHEROMONE_INTENSITY);
-                    batch.draw(textureRegions[4], cells[i].getColumn() * CELL_SIZE, cells[i].getRow() * CELL_SIZE,
-                            CELL_SIZE, CELL_SIZE);
-                }
-
-                if(drawRepellents) {
-                    float intensity = 0f;
-                    for(int j = 0; j < MAX_COLONY_COUNT; ++j){
-                        if(coloniesToDraw[j]){
-                            intensity += cells[i].getPheromoneOnCell(Pheromone.REPELLENT, j);
-                        }
-                    }
-                    batch.setColor(1f, 1f, 1f, intensity / MAX_PHEROMONE_INTENSITY);
-                    batch.draw(textureRegions[5], cells[i].getColumn() * CELL_SIZE, cells[i].getRow() * CELL_SIZE,
-                            CELL_SIZE, CELL_SIZE);
-                }
-
-                batch.setColor(1f, 1f, 1f, 1f);
             }
         }
 
@@ -290,6 +239,10 @@ public class World {
             }
         }
 
+    }
+
+    public WorldCell[] getCells() {
+        return cells;
     }
 
     public WorldCell getCell(Point2D.Float point){

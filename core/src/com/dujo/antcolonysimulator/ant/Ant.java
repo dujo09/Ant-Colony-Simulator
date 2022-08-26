@@ -19,8 +19,8 @@ public class Ant {
     public static final float ROTATE_SPEED = (float) (6f * Math.PI);
 
     public static final float ANT_SIZE = 6f;
-    public static final float ANT_VIEW_ANGLE = (float) (3 * Math.PI / 4);
-    public static final int VIEW_FRACTION_COUNT = 3;
+    public static final float ANT_VIEW_ANGLE = (float) (3 * Math.PI / 4); // View is split into fractions, resembles a handheld fan.
+    public static final int VIEW_FRACTION_COUNT = 7;
     public static final float ANT_VIEW_RANGE = ANT_SIZE * 7f;
     public static final float ANT_PICKUP_RANGE = 2.5f;
     public static final int MAX_FOOD_CARRY = 10;
@@ -66,6 +66,7 @@ public class Ant {
     }
 
     private void initialiseAngleOffsets(){
+        // For an angle of say 90 degrees and 3 fractions, the angle offsets are: +15 degrees, 0 degrees, -15 degrees
         angleOffsets = new AngleOffset[VIEW_FRACTION_COUNT];
         float deltaAngle = ANT_VIEW_ANGLE / VIEW_FRACTION_COUNT;
         int zeroOffsetIndex = VIEW_FRACTION_COUNT / 2;
@@ -90,7 +91,7 @@ public class Ant {
         if(pheromoneDropCooldown.isReady() && pheromone != null){
             pheromoneDropCooldown.reset();
 
-            world.setPheromone(position, pheromone, pheromoneIntensity, colony.getID());
+            world.setPheromone(position, pheromone, pheromoneIntensity, colony.getIndex());
             pheromoneIntensity -= 0.1f;
             if(pheromoneIntensity == 0f){
                 goal = Goal.RETURN_TO_COLONY;
@@ -127,14 +128,14 @@ public class Ant {
         float maxAnglePheromoneIntensity = 0f;
         float maxRepellentIntensity = 0f;
 
-        /* Ant view field is split into N fields, examine each field and set the target angle
-        * to the field with the most intense pheromone trail or goal cell
-        * */
+        // Analise each view field fraction, by generating N random points in that fraction and
+        // set the target angle to the fraction with the most intense pheromone trail for a goal
+        // or the goal cell (food or the colony)
         for(AngleOffset angleOffset : angleOffsets) {
             SampleResult sampleResult = new SampleResult();
 
             for (Point2D.Float samplePoint : getSamplePoints(
-                    30,
+                    20,
                     ANT_VIEW_ANGLE / VIEW_FRACTION_COUNT,
                     angleOffset.collision == null ? ANT_VIEW_RANGE : angleOffset.collision.getDistance(),
                     angleOffset.offset,
@@ -155,10 +156,10 @@ public class Ant {
                         break;
                     }
 
-                    sampleResult.totalPheromoneIntensity += sampleCell.getPheromoneOnCell(Pheromone.TO_FOOD, colony.getID());
+                    sampleResult.totalPheromoneIntensity += sampleCell.getPheromoneOnCell(Pheromone.TO_FOOD, colony.getIndex());
 
-                    if (sampleCell.getPheromoneOnCell(Pheromone.REPELLENT, colony.getID()) > sampleResult.maxRepellentIntensity) {
-                        sampleResult.maxRepellentIntensity = sampleCell.getPheromoneOnCell(Pheromone.REPELLENT, colony.getID());
+                    if (sampleCell.getPheromoneOnCell(Pheromone.REPELLENT, colony.getIndex()) > sampleResult.maxRepellentIntensity) {
+                        sampleResult.maxRepellentIntensity = sampleCell.getPheromoneOnCell(Pheromone.REPELLENT, colony.getIndex());
                     }
 
                 } else if (goal == Goal.RETURN_TO_COLONY) {
@@ -167,7 +168,7 @@ public class Ant {
                         break;
                     }
 
-                    sampleResult.totalPheromoneIntensity += sampleCell.getPheromoneOnCell(Pheromone.TO_COLONY, colony.getID());
+                    sampleResult.totalPheromoneIntensity += sampleCell.getPheromoneOnCell(Pheromone.TO_COLONY, colony.getIndex());
 
                 }
             }
@@ -190,7 +191,7 @@ public class Ant {
         if(repelCooldown.isReady() && foodHolding == 0 && maxRepellentIntensity > 0f && (float) Math.random() <= CHANCE_TO_REPEL){
             repelCooldown.reset();
 
-            world.setPheromone(position, Pheromone.REPELLENT, 100f, colony.getID());
+            world.setPheromone(position, Pheromone.REPELLENT, 100f, colony.getIndex());
             goal = Goal.RETURN_TO_COLONY;
             pheromone = null;
 
@@ -204,10 +205,13 @@ public class Ant {
         // Degrade trail due to simply passing over the pheromones
         world.getCell(position).degradePheromone(0.99f);
         // Degrade repellent if holding food
-        if(foodHolding > 0 && world.getCell(position).getPheromoneOnCell(Pheromone.REPELLENT, colony.getID()) > 0f){
-            world.getCell(position).degradePheromone(Pheromone.REPELLENT, 0.99f, colony.getID());
+        if(foodHolding > 0 && world.getCell(position).getPheromoneOnCell(Pheromone.REPELLENT, colony.getIndex()) > 0f){
+            world.getCell(position).degradePheromone(Pheromone.REPELLENT, 0.99f, colony.getIndex());
         }
 
+        // If goal point for direction is set then check if point is still valid
+        // (if food wasn't taken by another ant in the meantime)
+        // and if ant is close enough to fulfill goal
         if(direction.getGoalPoint() != null){
             if(goal == Goal.LOOK_FOR_FOOD){
                 if(world.isFoodOnPoint(direction.getGoalPoint())) {
@@ -233,7 +237,7 @@ public class Ant {
                         }
 
                         if(setRepellent){
-                            world.setPheromone(position, Pheromone.REPELLENT, 100f, colony.getID());
+                            world.setPheromone(position, Pheromone.REPELLENT, 100f, colony.getIndex());
                         }
 
                         direction.setGoalPoint(null);
@@ -260,6 +264,7 @@ public class Ant {
 
         Collision collision = angleOffsets[(int) (VIEW_FRACTION_COUNT / 2)].collision;
 
+        // If the distance for the angle offset of 0 degrees (forward) is <= 5, immediately change direction
         if(collision != null && collision.getDistance() <= 5f){
             Vector2 collisionVector = new Vector2(direction.getCurrentVector());
             collisionVector.x *= collision.getNormalVector().x != 0f ? -1f : 1f;
@@ -276,6 +281,18 @@ public class Ant {
 
     }
 
+    public Point2D.Float getPosition() {
+        return position;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public boolean isHoldingFood(){
+        return foodHolding > 0;
+    }
+
     private void updateAngleOffsets(){
         for(AngleOffset angleOffset : angleOffsets){
 
@@ -288,17 +305,6 @@ public class Ant {
 
     }
 
-    /**
-     * Method for getting random points used for sampling the world by
-     * generating a random vector
-     *
-     * @param sampleCount the number of points to generate
-     * @param viewAngle Ants view angle
-     * @param viewRange Ants view range
-     * @param angleOffset the angle offset for this sample
-     * @param rangeOffset the range offset for this sample
-     * @return the list of points to sample
-     */
     private List<Point2D.Float> getSamplePoints(int sampleCount, float viewAngle, float viewRange,
                                                 float angleOffset, float rangeOffset){
         List<Point2D.Float> pointList = new ArrayList<>();
@@ -344,24 +350,6 @@ public class Ant {
         float totalPheromoneIntensity;
         float maxRepellentIntensity;
         Point2D.Float goalPoint;
-
-    }
-
-    public void draw(SpriteBatch batch, Color color,
-                     TextureRegion antTextureRegion, TextureRegion carriedFood){
-        batch.setColor(color);
-        batch.draw(
-                antTextureRegion,
-                position.x  - ANT_SIZE / 2f, position.y  - ANT_SIZE / 2f,
-                ANT_SIZE / 2f, ANT_SIZE / 2f,
-                ANT_SIZE, ANT_SIZE,
-                1f, 1f,
-                (float) Math.toDegrees(direction.getCurrentAngle()));
-        batch.setColor(1f,1f,1f,1f);
-
-        if(foodHolding > 0){
-            batch.draw(carriedFood, position.x, position.y, 1f, 1f);
-        }
 
     }
 
