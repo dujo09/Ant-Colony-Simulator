@@ -14,7 +14,7 @@ public class World {
 
     public static final int COLUMN_COUNT = 400;
     public static final int ROW_COUNT = 400;
-    public static final float CELL_SIZE = 1;
+    public static final float CELL_SIZE = 2;
 
     public static float PHEROMONE_DEGRADE_PERIOD = 5f;
 

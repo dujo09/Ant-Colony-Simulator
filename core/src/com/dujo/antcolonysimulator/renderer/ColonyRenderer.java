@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.colony.Colony;
 
+import java.awt.geom.Point2D;
+
 public class ColonyRenderer {
     private Colony colony;
     private Color color;
@@ -31,7 +33,17 @@ public class ColonyRenderer {
     }
 
     void renderAnts(SpriteBatch batch, TextureRegion[] textureRegions){
-        for(Ant ant : colony.getAnts()){
+        for(Ant ant : colony.getAnts()) {
+            /*for (Point2D.Float sample : ant.samples)
+                batch.draw(
+                        textureRegions[1],
+                        sample.x,
+                        sample.y,
+                        1f,
+                        1f
+                );*/
+
+
             batch.setColor(color);
             batch.draw(
                     textureRegions[0],

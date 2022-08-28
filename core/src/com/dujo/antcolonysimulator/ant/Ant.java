@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Ant {
-    public static final float MOVE_SPEED = 12f;
+    public static final float MOVE_SPEED = 20f;
     public static final float ROTATE_SPEED = (float) (6f * Math.PI);
 
-    public static final float ANT_SIZE = 6f;
-    public static final float ANT_VIEW_ANGLE = (float) (3 * Math.PI / 4); // View is split into fractions, resembles a handheld fan.
-    public static final int VIEW_FRACTION_COUNT = 7;
+    public static final float ANT_SIZE = 4f;
+    public static final float ANT_VIEW_ANGLE = (float) (Math.PI / 2); // View is split into fractions, resembles a handheld fan.
+    public static final int VIEW_FRACTION_COUNT = 3;
     public static final float ANT_VIEW_RANGE = ANT_SIZE * 7f;
     public static final float ANT_PICKUP_RANGE = 2.5f;
     public static final int MAX_FOOD_CARRY = 10;
@@ -29,7 +29,7 @@ public class Ant {
     public static final float PHEROMONE_DROP_PERIOD = 0.25f;
     public static final float REPEL_PERIOD = 120f;
 
-    public static final float DESIRE_TO_WANDER = 0.15f;
+    public static final float DESIRE_TO_WANDER = 0.8f;
     final float CHANCE_TO_REPEL = 0.01f;
 
     private final Point2D.Float position;
@@ -83,7 +83,19 @@ public class Ant {
 
     }
 
+    //public List<Point2D.Float> samples = new ArrayList<>();
+
     public void update(float deltaTime){
+       /* samples.clear();
+        for(AngleOffset angleOffset : angleOffsets)
+        samples.addAll(getSamplePoints(
+                20,
+                ANT_VIEW_ANGLE / VIEW_FRACTION_COUNT,
+                angleOffset.collision == null ? ANT_VIEW_RANGE : angleOffset.collision.getDistance(),
+                angleOffset.offset,
+                ANT_PICKUP_RANGE
+        ));*/
+
         rotationCooldown.update(deltaTime);
         pheromoneDropCooldown.update(deltaTime);
         repelCooldown.update(deltaTime);

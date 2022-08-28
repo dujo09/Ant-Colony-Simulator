@@ -44,12 +44,12 @@ public class MyRenderer {
                 renderToColonyPheromones, renderToFoodPheromones, renderRepellentPheromones
         );
 
-        for(ColonyRenderer colonyRenderer : colonyRenderers){
-            if(colonyRenderer != null) {
-                colonyRenderer.render(batch, textureRegions);
+        for(int i = 0; i < colonyRenderers.length; ++i){
+            if(colonyRenderers[i] != null && renderColonies[i]) {
+                colonyRenderers[i].render(batch, textureRegions);
 
                 if (renderAnts) {
-                    colonyRenderer.renderAnts(batch, textureRegions);
+                    colonyRenderers[i].renderAnts(batch, textureRegions);
                 }
             }
         }

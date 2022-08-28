@@ -122,7 +122,7 @@ public class Direction {
     }
 
     public void setRandomTargetAngle(){
-        setTargetAngle(getCurrentAngle() + (float) (Math.random() * Math.PI / 4 - Math.PI / 8));
+        setTargetAngle(getCurrentAngle() + (float) (Math.random() * Math.PI / 8 - Math.PI / 16));
     }
 
 }
