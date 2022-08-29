@@ -34,15 +34,27 @@ public class ColonyRenderer {
 
     void renderAnts(SpriteBatch batch, TextureRegion[] textureRegions){
         for(Ant ant : colony.getAnts()) {
+            batch.setColor(color);
             /*for (Point2D.Float sample : ant.samples)
                 batch.draw(
                         textureRegions[1],
                         sample.x,
                         sample.y,
-                        1f,
-                        1f
+                        2f,
+                        2f
                 );*/
 
+            batch.draw(
+                    textureRegions[1],
+                    ant.getPosition().x,
+                    ant.getPosition().y,
+                    1f,
+                    1f,
+                    5f,
+                    1f,
+                    1f,
+                    1f,
+                    (float)Math.toDegrees(ant.getDirection().getTargetAngle()));
 
             batch.setColor(color);
             batch.draw(

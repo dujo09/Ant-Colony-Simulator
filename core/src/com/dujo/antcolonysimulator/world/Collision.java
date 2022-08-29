@@ -6,7 +6,8 @@ public class Collision {
     private Vector2 normalVector;
     private float distance;
 
-    Collision(){
+    Collision(float distance){
+        this.distance = distance;
     }
 
     public Vector2 getNormalVector() {

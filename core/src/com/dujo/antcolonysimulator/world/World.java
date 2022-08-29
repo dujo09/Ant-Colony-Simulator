@@ -14,7 +14,7 @@ public class World {
 
     public static final int COLUMN_COUNT = 400;
     public static final int ROW_COUNT = 400;
-    public static final float CELL_SIZE = 2;
+    public static final float CELL_SIZE = 1;
 
     public static float PHEROMONE_DEGRADE_PERIOD = 5f;
 
@@ -33,7 +33,8 @@ public class World {
             cells[i] = new WorldCell(row, column);
 
             // Create wall border around whole world
-            if(row == 0 || row == ROW_COUNT - 1 || column == 0 || column == COLUMN_COUNT - 1){
+            if(row == 0 || row == 1 || row == ROW_COUNT - 1 || row == ROW_COUNT - 2 ||
+                    column == 0 || column == 1 || column == COLUMN_COUNT - 1 || column == COLUMN_COUNT - 2){
                 cells[i].setWall(true);
             }
         }
@@ -64,6 +65,8 @@ public class World {
      * @return null if no collision, a collision otherwise
      */
     public Collision getFirstCollision(Point2D.Float position, float directionAngle, float targetDistance){
+        Collision collision = new Collision(targetDistance);
+
         int column = (int) (position.x  / CELL_SIZE);
         int row = (int) (position.y / CELL_SIZE);
         Vector2 directionVector = new Vector2((float) Math.cos(directionAngle), (float) Math.sin(directionAngle));
@@ -90,15 +93,14 @@ public class World {
             row += isDistanceVerticalSmaller ? 0 : stepVector.y;
 
             if(checkCell(row, column) || getCell(row, column).isWall()){
-                Collision collision = new Collision();
                 collision.setDistance(distance);
                 collision.setNormalVector(new Vector2(
                         isDistanceVerticalSmaller ? 1f : 0f,
                         !isDistanceVerticalSmaller ? 1f : 0f));
-                return collision;
+                break;
             }
         }
-        return null;
+        return collision;
 
     }
 

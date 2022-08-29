@@ -121,8 +121,4 @@ public class Direction {
         this.goalPoint = goalPoint;
     }
 
-    public void setRandomTargetAngle(){
-        setTargetAngle(getCurrentAngle() + (float) (Math.random() * Math.PI / 8 - Math.PI / 16));
-    }
-
 }
