@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.colony.Colony;
+import com.dujo.antcolonysimulator.world.World;
+import sun.awt.windows.WPrinterJob;
 
 import java.awt.geom.Point2D;
 
@@ -34,15 +36,26 @@ public class ColonyRenderer {
 
     void renderAnts(SpriteBatch batch, TextureRegion[] textureRegions){
         for(Ant ant : colony.getAnts()) {
-            batch.setColor(color);
-            /*for (Point2D.Float sample : ant.samples)
+           /* batch.setColor(color);
+            if(ant.maxCell != null) {
                 batch.draw(
                         textureRegions[1],
-                        sample.x,
-                        sample.y,
-                        2f,
-                        2f
-                );*/
+                        ant.maxCell.getColumn() * World.CELL_SIZE,
+                        ant.maxCell.getRow() * World.CELL_SIZE,
+                        World.CELL_SIZE * 5f,
+                        World.CELL_SIZE * 5f
+                );
+            }
+
+            batch.setColor(color);
+            for (int i = 0; i < ant.samples.size(); ++i)
+                batch.draw(
+                        textureRegions[1],
+                        ant.samples.get(i).point.x,
+                        ant.samples.get(i).point.y,
+                        World.CELL_SIZE,
+                        World.CELL_SIZE
+                );
 
             batch.draw(
                     textureRegions[1],
@@ -54,7 +67,7 @@ public class ColonyRenderer {
                     1f,
                     1f,
                     1f,
-                    (float)Math.toDegrees(ant.getDirection().getTargetAngle()));
+                    (float)Math.toDegrees(ant.getDirection().getTargetAngle()));*/
 
             batch.setColor(color);
             batch.draw(

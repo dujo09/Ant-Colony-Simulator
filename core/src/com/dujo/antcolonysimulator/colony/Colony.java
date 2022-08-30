@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Colony {
-    public static final int ANT_COUNT = 500;
+    public static final int ANT_COUNT = 100;
 
     public static final int COLONY_SIZE = 8;
 

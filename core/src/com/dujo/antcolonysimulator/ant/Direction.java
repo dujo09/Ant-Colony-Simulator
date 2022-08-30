@@ -1,5 +1,6 @@
 package com.dujo.antcolonysimulator.ant;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import java.awt.geom.Point2D;
@@ -28,39 +29,57 @@ public class Direction {
     public void rotate(float deltaTime, float rotateSpeed){
         int moveDirection = 0;
         float currentAngleOpposite = getCurrentVectorOpposite().angleRad();
+        float angleDifference = 0f;
 
-        if(Math.abs(targetAngle - currentAngle) <= 0.2f){
+        if(targetAngle == currentAngle){
             return;
         }else if(currentAngle >= 0f) {
-            if (targetAngle <= 0f) {
+            if (targetAngle >= 0f) {
+                if(targetAngle > currentAngle){
+                    moveDirection = 1;
+                    angleDifference = targetAngle - currentAngle;
+                }else{
+                    moveDirection = -1;
+                    angleDifference = currentAngle - targetAngle;
+                }
+            }else{
                 if (targetAngle < currentAngleOpposite) {
                     moveDirection = 1;
                 } else {
                     moveDirection = -1;
                 }
-            }else{
-                if(targetAngle > currentAngle){
-                    moveDirection = 1;
-                }else{
-                    moveDirection = -1;
-                }
+                angleDifference = ((float)(2 * Math.PI)) + targetAngle - currentAngle;
             }
         } else {
-            if(targetAngle >= 0f) {
+            if(targetAngle < 0f) {
+                if(targetAngle > currentAngle){
+                    moveDirection = 1;
+                    angleDifference = -currentAngle + targetAngle;
+                }else{
+                    moveDirection = -1;
+                    angleDifference = -targetAngle + currentAngle;
+                }
+            }else{
                 if (targetAngle > currentAngleOpposite) {
                     moveDirection = -1;
                 } else {
                     moveDirection = 1;
                 }
-            }else{
-                if(targetAngle > currentAngle){
-                    moveDirection = 1;
-                }else{
-                    moveDirection = -1;
-                }
+                angleDifference = (float)(2 * Math.PI) + currentAngle - targetAngle;
             }
         }
-        setCurrentAngle(currentAngle + moveDirection * rotateSpeed * deltaTime);
+        float rotationAngle = rotateSpeed * deltaTime;
+        if(rotationAngle > angleDifference){
+            rotationAngle = angleDifference;
+        }
+        rotationAngle *= moveDirection;
+        /*Gdx.app.log("Angles",
+                "DIff: " + (int) Math.toDegrees(angleDifference) +
+                        " Rotation: " + (int) Math.toDegrees(rotationAngle) +
+                        " Current: " + (int) Math.toDegrees(currentAngle) +
+                        " Target: " + (int) Math.toDegrees(targetAngle));*/
+
+        setCurrentAngle(currentAngle + rotationAngle);
 
     }
 
@@ -119,6 +138,11 @@ public class Direction {
 
     public void setGoalPoint(Point2D.Float goalPoint) {
         this.goalPoint = goalPoint;
+    }
+
+    public void setRandomTarget(){
+        float randomAngle = (float) (Math.random() * Ant.ANT_VIEW_ANGLE - Ant.ANT_VIEW_ANGLE / 2f);
+        setTargetAngle(currentAngle + randomAngle);
     }
 
 }

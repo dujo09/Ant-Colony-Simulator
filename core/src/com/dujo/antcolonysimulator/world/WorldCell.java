@@ -3,6 +3,8 @@ package com.dujo.antcolonysimulator.world;
 import com.badlogic.gdx.math.MathUtils;
 import com.dujo.antcolonysimulator.ant.Pheromone;
 
+import java.awt.geom.Point2D;
+
 public class WorldCell {
     private final int row;
     private final int column;
@@ -44,7 +46,13 @@ public class WorldCell {
         return column;
     }
 
-    // Get pheromone of all given colonies
+    public Point2D.Float getCellCenter(){
+        return new Point2D.Float(
+                column * World.CELL_SIZE - World.CELL_SIZE / 2f,
+                row * World.CELL_SIZE - World.CELL_SIZE / 2f
+        );
+    }
+
     public float getPheromoneOnCell(Pheromone pheromone, int colonyID){
         return colonyPheromones[colonyID][pheromone.ordinal()];
     }
@@ -54,7 +62,6 @@ public class WorldCell {
         colonyPheromones[colonyID][pheromone.ordinal()] = Math.max(colonyPheromones[colonyID][pheromone.ordinal()], intensity);
     }
 
-
     public void degradePheromone(float ratio, int colonyID){
         degradePheromone(Pheromone.TO_COLONY, ratio, colonyID);
         degradePheromone(Pheromone.TO_FOOD, ratio, colonyID);
@@ -62,27 +69,23 @@ public class WorldCell {
     }
 
     public void degradePheromone(float ratio){
-        degradePheromone(Pheromone.TO_COLONY, ratio);
-        degradePheromone(Pheromone.TO_FOOD, ratio);
-        degradePheromone(Pheromone.REPELLENT, ratio);
+        for(int i = 0; i < World.MAX_COLONY_COUNT; ++i){
+            colonyPheromones[i][Pheromone.TO_COLONY.ordinal()] *= ratio;
+        }
+        for(int i = 0; i < World.MAX_COLONY_COUNT; ++i){
+            colonyPheromones[i][Pheromone.TO_FOOD.ordinal()] *= ratio;
+        }
+        for(int i = 0; i < World.MAX_COLONY_COUNT; ++i){
+            colonyPheromones[i][Pheromone.REPELLENT.ordinal()] *= ratio;
+        }
     }
 
-   public void degradePheromone(Pheromone pheromone, float ratio, int colonyID){
+    public void degradePheromone(Pheromone pheromone, float ratio, int colonyID){
         colonyPheromones[colonyID][pheromone.ordinal()] *= ratio;
-   }
-
-   public void degradePheromone(Pheromone pheromone, float ratio){
-       for(int i = 0; i < World.MAX_COLONY_COUNT; ++i){
-           colonyPheromones[i][pheromone.ordinal()] *= ratio;
-       }
    }
 
     public void removePheromones(){
         degradePheromone(0f);
-    }
-
-    public void removePheromones(int colonyID){
-        degradePheromone(0f, colonyID);
     }
 
     public int getFoodOnCell() {
