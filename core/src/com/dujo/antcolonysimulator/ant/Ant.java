@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Ant {
     public static final float MOVE_SPEED = 20f;
-    public static final float ROTATE_SPEED = 20f;
+    public static final float ROTATE_SPEED = 10f;
 
     public static final float ANT_SIZE = 4f;
     public static final float ANT_VIEW_ANGLE = (float) (3 * Math.PI / 4);
@@ -62,6 +62,10 @@ public class Ant {
     public List<Point2D.Float> samples = new ArrayList<>(); //DEBUG
 
     public void update(float deltaTime){
+        if(World.isPointOutOfBounds(position)){
+            return;
+        }
+
         rotationCooldown.update(deltaTime);
         pheromoneDropCooldown.update(deltaTime);
         repelCooldown.update(deltaTime);
@@ -179,7 +183,7 @@ public class Ant {
 
     private void updatePosition(float deltaTime){
         // Degrade trail due to simply passing over the pheromones
-        //world.getCell(position).degradePheromone(0.85f);
+        world.getCell(position).degradePheromone(0.99f);
 
         // Check if goal is still valid and if close enough to fulfill it
         if(direction.getGoalPoint() != null){

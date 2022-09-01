@@ -21,13 +21,12 @@ import com.dujo.antcolonysimulator.world.World;
 import java.awt.geom.Point2D;
 
 public class AntColonySimulation extends ApplicationAdapter {
-
-
 	private World world;
 	private Colony[] colonies;
 	private int colonyCount;
 	private MyRenderer renderer;
-
+	private int timeScale;
+	private boolean isPaused;
 	private SpriteBatch batch;
 	private OrthographicCamera camera;
 	private Texture spriteSheet;
@@ -61,6 +60,8 @@ public class AntColonySimulation extends ApplicationAdapter {
 		isPlaceMode = true;
 		isFoodSelected = true;
 
+		timeScale = 1;
+
 	}
 
 	@Override
@@ -74,6 +75,9 @@ public class AntColonySimulation extends ApplicationAdapter {
 		batch.begin();
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
+
+		deltaTime *= isPaused ? 0f : timeScale;
+
 		world.update(deltaTime);
 		for(Colony colony : colonies){
 			if(colony != null){
@@ -156,42 +160,39 @@ public class AntColonySimulation extends ApplicationAdapter {
 				++colonyCount;
 			}
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
 			renderer.toggleColonyRendering(0);
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.J)){
 			renderer.toggleColonyRendering(1);
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
 			renderer.toggleColonyRendering(2);
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.V)){
 			renderer.toggleToColonyPheromoneRendering();
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.B)){
 			renderer.toggleToFoodPheromoneRendering();
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.N)){
 			renderer.toggleRepellentPheromoneRendering();
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.M)){
 			renderer.toggleAntRendering();
 		}
-		if(Gdx.input.isKeyPressed(Input.Keys.U)){
-			Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
-			camera.unproject(touchPosition);
-			Point2D.Float touchPosition2D = new Point2D.Float(touchPosition.x, touchPosition.y);
-
-			world.setPheromone(touchPosition2D, Pheromone.TO_FOOD, 100f, 0);
+		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+			isPaused = !isPaused;
 		}
-		/*if(Gdx.input.isKeyPressed(Input.Keys.TAB)){
-			Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
-			camera.unproject(touchPosition);
-			Point2D.Float touchPosition2D = new Point2D.Float(touchPosition.x, touchPosition.y);
-
-			Ant ant = colonies[0].getAnts().get(0);
-			ant.getDirection().setTargetVector(ant.getPosition(), touchPosition2D);
-		}*/
+		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+			timeScale = 1;
+		}
+		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)){
+			timeScale = 2;
+		}
+		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
+			timeScale = 3;
+		}
 
 	}
 	

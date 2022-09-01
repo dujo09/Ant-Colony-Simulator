@@ -1,6 +1,8 @@
 package com.dujo.antcolonysimulator.world;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.ant.Pheromone;
 import com.dujo.antcolonysimulator.colony.Colony;
 import com.dujo.antcolonysimulator.common.Cooldown;
@@ -247,7 +249,7 @@ public class World {
         return cells;
     }
 
-    public WorldCell getCell(Point2D.Float point){
+    public WorldCell getCell(Point2D.Float point) {
         return cells[(int) (point.y / CELL_SIZE) * COLUMN_COUNT + (int) (point.x / CELL_SIZE)];
     }
 
