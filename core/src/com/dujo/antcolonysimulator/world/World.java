@@ -14,7 +14,7 @@ public class World {
 
     public static final int COLUMN_COUNT = 300;
     public static final int ROW_COUNT = 300;
-    public static final float CELL_SIZE = 2;
+    public static final float CELL_SIZE = 1;
 
     public static float PHEROMONE_DEGRADE_PERIOD = 2f;
 
@@ -46,7 +46,7 @@ public class World {
         for(int i = 0; i < ROW_COUNT * COLUMN_COUNT; ++i){
             cells[i].update();
             if(pheromoneDegradeCooldown.isReady()){
-                cells[i].degradePheromone(0.99f);
+                cells[i].degradePheromone(0.9f);
             }
         }
 

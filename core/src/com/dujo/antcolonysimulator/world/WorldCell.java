@@ -58,8 +58,10 @@ public class WorldCell {
     }
 
     public void setPheromoneOnCell(Pheromone pheromone, float intensity, int colonyID){
-        intensity = MathUtils.clamp(intensity, 0f, World.MAX_PHEROMONE_INTENSITY);
-        colonyPheromones[colonyID][pheromone.ordinal()] = Math.max(colonyPheromones[colonyID][pheromone.ordinal()], intensity);
+        if(!isWall) {
+            intensity = MathUtils.clamp(intensity, 0f, World.MAX_PHEROMONE_INTENSITY);
+            colonyPheromones[colonyID][pheromone.ordinal()] = Math.max(colonyPheromones[colonyID][pheromone.ordinal()], intensity);
+        }
     }
 
     public void degradePheromone(float ratio, int colonyID){

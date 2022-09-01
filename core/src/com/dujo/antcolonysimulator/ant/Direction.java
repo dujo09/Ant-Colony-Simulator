@@ -27,6 +27,12 @@ public class Direction {
     }
 
     public void rotate(float deltaTime, float rotateSpeed){
+        /*Vector2 directionNormalVector = new Vector2(-currentVector.y, currentVector.x);
+		float directionDelta = new Vector2(targetVector).dot(directionNormalVector);
+        float rotationAngle = rotateSpeed * directionDelta * deltaTime;
+
+        setCurrentAngle(currentAngle + rotationAngle);*/
+
         int moveDirection = 0;
         float currentAngleOpposite = getCurrentVectorOpposite().angleRad();
         float angleDifference = 0f;
