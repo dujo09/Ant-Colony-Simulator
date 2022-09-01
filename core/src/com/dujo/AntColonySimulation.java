@@ -169,7 +169,7 @@ public class AntColonySimulation extends ApplicationAdapter {
 		if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
 			renderer.toggleColonyRendering(2);
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.V)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
 			renderer.toggleToColonyPheromoneRendering();
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.B)){

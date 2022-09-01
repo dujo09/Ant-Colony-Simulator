@@ -16,10 +16,11 @@ public class WorldRenderer {
     void render(SpriteBatch batch, TextureRegion[] textureRegions,
                 boolean[] renderColonies,
                 boolean renderToColonyPheromones, boolean renderToFoodPheromones, boolean renderRepellentPheromones) {
+        WorldCell[] cells = world.getCells();
         for (int i = 0; i < World.COLUMN_COUNT * World.ROW_COUNT; ++i) {
-            WorldCell[] cells = world.getCells();
 
             if (!cells[i].isEmpty()) {
+                batch.setColor(1f, 1f, 1f, 1f);
                 // Draw wall if on cell
                 if (cells[i].isWall()) {
                     batch.draw(
@@ -29,6 +30,7 @@ public class WorldRenderer {
                             World.CELL_SIZE,
                             World.CELL_SIZE
                     );
+                    continue;
                 }
 
                 // Draw food if on cell
@@ -41,6 +43,7 @@ public class WorldRenderer {
                             World.CELL_SIZE,
                             World.CELL_SIZE
                     );
+                    continue;
                 }
 
                 // Draw to colony pheromones if not disabled by the user
@@ -87,7 +90,7 @@ public class WorldRenderer {
                             intensity += cells[i].getPheromoneOnCell(Pheromone.REPELLENT, j);
                         }
                     }
-                    batch.setColor(1f, 1f, 1f, intensity / World.MAX_PHEROMONE_INTENSITY);
+                    batch.setColor(1f, 1f, 1f, intensity / World.MAX_REPELENT_INTENSITY);
                     batch.draw(
                             textureRegions[5],
                             cells[i].getColumn() * World.CELL_SIZE,
@@ -98,6 +101,7 @@ public class WorldRenderer {
                 }
 
                 batch.setColor(1f, 1f, 1f, 1f);
+
             }
         }
     }

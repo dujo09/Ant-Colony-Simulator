@@ -12,13 +12,14 @@ import java.awt.geom.Point2D;
 public class World {
     public static final int MAX_COLONY_COUNT = 3;
     public static final float MAX_PHEROMONE_INTENSITY = 100f;
+    public static final float MAX_REPELENT_INTENSITY = 200f;
     public static final float MAX_FOOD_ON_CELL = 100f;
 
     public static final int COLUMN_COUNT = 300;
     public static final int ROW_COUNT = 300;
     public static final float CELL_SIZE = 1;
 
-    public static float PHEROMONE_DEGRADE_PERIOD = 2f;
+    public static float PHEROMONE_DEGRADE_PERIOD = 0.25f;
 
     private final WorldCell[] cells;
     private final Cooldown pheromoneDegradeCooldown;
@@ -48,7 +49,7 @@ public class World {
         for(int i = 0; i < ROW_COUNT * COLUMN_COUNT; ++i){
             cells[i].update();
             if(pheromoneDegradeCooldown.isReady()){
-                cells[i].degradePheromone(0.9f);
+                cells[i].degradePheromone(0.99f);
             }
         }
 
@@ -113,6 +114,14 @@ public class World {
     public void setPheromone(Point2D.Float point, Pheromone pheromone, float intensity, int colonyID){
         getCell(point).setPheromoneOnCell(pheromone, intensity, colonyID);
 
+    }
+
+    public void degradePheromone(Point2D.Float point, Pheromone pheromone, float ratio, int colonyID){
+        getCell(point).degradePheromone(pheromone, ratio, colonyID);
+    }
+
+    public void degradePheromone(Point2D.Float point, float ratio){
+        getCell(point).degradePheromone(ratio);
     }
 
     public int getFood(Point2D.Float point){

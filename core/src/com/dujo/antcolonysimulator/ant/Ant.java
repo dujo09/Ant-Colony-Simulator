@@ -16,7 +16,7 @@ public class Ant {
     public static final float ROTATE_SPEED = 10f;
 
     public static final float ANT_SIZE = 4f;
-    public static final float ANT_VIEW_ANGLE = (float) (3 * Math.PI / 4);
+    public static final float ANT_VIEW_ANGLE = (float) (Math.PI);
     public static final float DELTA_VIEW_ANGLE = ANT_VIEW_ANGLE / 3; // View angle is split into 3 parts: left, right and center
     public static final float ANT_VIEW_RANGE = ANT_SIZE * 10f;
     public static final float ANT_PICKUP_RANGE = World.CELL_SIZE * 2;
@@ -24,10 +24,10 @@ public class Ant {
 
     public static final float ROTATION_PERIOD = 0.25f;
     public static final float PHEROMONE_DROP_PERIOD = 0.25f;
-    public static final float REPEL_PERIOD = 120f;
+    public static final float REPEL_PERIOD = 0f;
 
     public static final float DESIRE_TO_WANDER = 0.01f;
-    final float CHANCE_TO_REPEL = 0.01f;
+    final float CHANCE_TO_REPEL = 0.5f;
 
     private final Point2D.Float position;
     private final Direction direction;
@@ -134,7 +134,13 @@ public class Ant {
                         sampleResult.maxRepellentIntensity = sampleCell.getPheromoneOnCell(Pheromone.REPELLENT, colony.getIndex());
                     }
 
-                } else if (goal == Goal.RETURN_TO_COLONY) {
+                } else if (goal == Goal.RETURN_TO_COLONY || goal == Goal.REPEL_FROM_TRAIL) {
+                    if (goal == Goal.REPEL_FROM_TRAIL && foodHolding == 0 && sampleCell.isFoodOnCell()) {
+                        sampleResult.goalPoint = samplePoint.point;
+                        goal = Goal.LOOK_FOR_FOOD;
+                        break;
+                    }
+
                     if (arePointsInRangeOfEachOther(samplePoint.point, colony.getPosition(), ANT_PICKUP_RANGE)) {
                         sampleResult.goalPoint = samplePoint.point;
                         break;
@@ -169,8 +175,7 @@ public class Ant {
         if(repelCooldown.isReady() && foodHolding == 0 && maxRepellentIntensity > 0f && (float) Math.random() <= CHANCE_TO_REPEL){
             repelCooldown.reset();
 
-            world.setPheromone(position, Pheromone.REPELLENT, 100f, colony.getIndex());
-            goal = Goal.RETURN_TO_COLONY;
+            goal = Goal.REPEL_FROM_TRAIL;
             pheromone = null;
 
         }else if(maxAnglePheromoneIntensity > 0f){
@@ -183,7 +188,11 @@ public class Ant {
 
     private void updatePosition(float deltaTime){
         // Degrade trail due to simply passing over the pheromones
-        world.getCell(position).degradePheromone(0.99f);
+        world.degradePheromone(position, 0.99f);
+
+        if(goal == Goal.REPEL_FROM_TRAIL){
+            world.degradePheromone(position, 0.5f);
+        }
 
         // Check if goal is still valid and if close enough to fulfill it
         if(direction.getGoalPoint() != null){
@@ -192,9 +201,9 @@ public class Ant {
                     if (isPositionInRangeOfPoint(direction.getGoalPoint())) {
                         foodHolding = world.takeFood(direction.getGoalPoint(), MAX_FOOD_CARRY);
 
-                        goal = Goal.RETURN_TO_COLONY;
+                        goal = Goal.REPEL_FROM_TRAIL;
                         pheromone = null;
-                        pheromoneIntensity = World.MAX_PHEROMONE_INTENSITY;
+                        pheromoneIntensity = World.MAX_REPELENT_INTENSITY;
                         boolean setRepellent = true;
 
                         for (SamplePoint samplePoint : getSamplePoints(
@@ -204,13 +213,16 @@ public class Ant {
                                 0f)){
                             if (world.isFoodOnPoint(samplePoint.point)) {
                                 setRepellent = false;
+                                goal = Goal.RETURN_TO_COLONY;
                                 pheromone = Pheromone.TO_FOOD;
+                                pheromoneIntensity = World.MAX_PHEROMONE_INTENSITY;
                                 break;
                             }
                         }
 
                         if(setRepellent){
-                            world.setPheromone(position, Pheromone.REPELLENT, 100f, colony.getIndex());
+                            world.setPheromone(position, Pheromone.REPELLENT, pheromoneIntensity, colony.getIndex());
+                            repelCooldown.reset();
                         }
 
                         direction.setGoalPoint(null);
@@ -219,7 +231,7 @@ public class Ant {
                 }else{
                     direction.setGoalPoint(null);
                 }
-            }else if(goal == Goal.RETURN_TO_COLONY){
+            }else if(goal == Goal.RETURN_TO_COLONY || goal == Goal.REPEL_FROM_TRAIL){
                 if(arePointsInRangeOfEachOther(position, colony.getPosition(), Colony.COLONY_RADIUS)){
                     if(foodHolding > 0){
                         colony.addFood(foodHolding);
@@ -247,8 +259,12 @@ public class Ant {
             collisionVector.y *= collision.getNormalVector().y != 0f ? -1f : 1f;
 
             direction.setGoalPoint(null);
-            direction.setCurrentVector(collisionVector);
             direction.setTargetVector(collisionVector);
+
+            Vector2 averageVector = new Vector2(collisionVector);
+            averageVector.add(direction.getTargetVector());
+            averageVector.nor();
+            direction.setCurrentVector(averageVector);
 
         }
 
