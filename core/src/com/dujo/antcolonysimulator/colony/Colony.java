@@ -1,6 +1,5 @@
 package com.dujo.antcolonysimulator.colony;
 
-import com.badlogic.gdx.Gdx;
 import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.common.Cooldown;
 import com.dujo.antcolonysimulator.world.World;
@@ -12,7 +11,7 @@ import java.util.List;
 public class Colony {
     public static final int ANT_COUNT = 100;
 
-    public static final int COLONY_SIZE = 8;
+    public static final int COLONY_RADIUS = (int)World.CELL_SIZE * 10;
 
     public static final float ANT_CREATE_PERIOD = 2f;
     public static final int ANT_CREATE_COST = 100;

@@ -141,8 +141,12 @@ public class Direction {
     }
 
     public void setRandomTarget(){
-        float randomAngle = (float) (Math.random() * Ant.ANT_VIEW_ANGLE - Ant.ANT_VIEW_ANGLE / 2f);
-        setTargetAngle(currentAngle + randomAngle);
+        //float randomAngle = (float) (Math.random() * Ant.ANT_VIEW_ANGLE - Ant.ANT_VIEW_ANGLE / 2f);
+        if(Math.random() > 0.5f){
+            setTargetAngle(currentAngle + (float)(Math.PI / 6));
+        }else {
+            setTargetAngle(currentAngle - (float)(Math.PI / 6));
+        }
     }
 
 }

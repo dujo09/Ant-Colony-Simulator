@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.dujo.antcolonysimulator.ant.Ant;
+import com.dujo.antcolonysimulator.ant.Pheromone;
 import com.dujo.antcolonysimulator.colony.Colony;
 import com.dujo.antcolonysimulator.renderer.ColonyRenderer;
 import com.dujo.antcolonysimulator.renderer.MyRenderer;
@@ -175,6 +176,13 @@ public class AntColonySimulation extends ApplicationAdapter {
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)){
 			renderer.toggleAntRendering();
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.U)){
+			Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
+			camera.unproject(touchPosition);
+			Point2D.Float touchPosition2D = new Point2D.Float(touchPosition.x, touchPosition.y);
+
+			world.setPheromone(touchPosition2D, Pheromone.TO_FOOD, 100f, 0);
 		}
 		/*if(Gdx.input.isKeyPressed(Input.Keys.TAB)){
 			Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
