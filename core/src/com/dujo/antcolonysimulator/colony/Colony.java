@@ -62,7 +62,7 @@ public class Colony {
 
     private void createAnt(){
         if(food > ANT_CREATE_COST){
-            ants.add(new Ant(new Point2D.Float(position.x, position.y), 0f, world, this));
+            //ants.add(new Ant(new Point2D.Float(position.x, position.y), 0f, world, this));
             food -= ANT_CREATE_COST;
             antCreateCooldown.reset();
         }

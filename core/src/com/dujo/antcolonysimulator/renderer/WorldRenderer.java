@@ -83,23 +83,21 @@ public class WorldRenderer {
                     );
                 }
 
-                // Draw to repellent pheromones if not disabled by the user
-                if (renderRepellentPheromones) {
-                    float intensity = 0f;
-                    for (int j = 0; j < World.MAX_COLONY_COUNT; ++j) {
-                        if (renderColonies[j]) {
-                            intensity += cells[i].getPheromoneOnCell(Pheromone.REPELLENT, j);
-                        }
+                // Always draw repellent pheromones
+                float intensity = 0f;
+                for (int j = 0; j < World.MAX_COLONY_COUNT; ++j) {
+                    if (renderColonies[j]) {
+                        intensity += cells[i].getPheromoneOnCell(Pheromone.REPELLENT, j);
                     }
-                    batch.setColor(1f, 1f, 1f, intensity / World.MAX_REPELLENT_INTENSITY);
-                    batch.draw(
-                            textureRegions[5],
-                            cells[i].getColumn() * world.getCellSize(),
-                            cells[i].getRow() * world.getCellSize(),
-                            world.getCellSize(),
-                            world.getCellSize()
-                    );
                 }
+                batch.setColor(1f, 1f, 1f, intensity / World.MAX_REPELLENT_INTENSITY);
+                batch.draw(
+                        textureRegions[5],
+                        cells[i].getColumn() * world.getCellSize(),
+                        cells[i].getRow() * world.getCellSize(),
+                        world.getCellSize(),
+                        world.getCellSize()
+                );
 
                 batch.setColor(1f, 1f, 1f, 1f);
             }

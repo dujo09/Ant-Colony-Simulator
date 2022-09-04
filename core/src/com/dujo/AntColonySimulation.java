@@ -109,11 +109,11 @@ public class AntColonySimulation extends ApplicationAdapter {
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
 			brushSize += 1f;
-			brushSize = MathUtils.clamp(brushSize, 1, 20);
+			brushSize = MathUtils.clamp(brushSize, 1, 50);
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.L)){
 			brushSize -= 1f;
-			brushSize = MathUtils.clamp(brushSize, 1, 20);
+			brushSize = MathUtils.clamp(brushSize, 1, 50);
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F)){
 			isFoodSelected = true;
@@ -166,16 +166,13 @@ public class AntColonySimulation extends ApplicationAdapter {
 		if(Gdx.input.isKeyJustPressed(Input.Keys.K)){
 			renderer.toggleColonyRendering(2);
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.Y) || Gdx.input.isKeyJustPressed(Input.Keys.Z)){
 			renderer.toggleToColonyPheromoneRendering();
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.B)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.X)){
 			renderer.toggleToFoodPheromoneRendering();
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.N)){
-			renderer.toggleRepellentPheromoneRendering();
-		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.M)){
+		if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
 			renderer.toggleAntRendering();
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
@@ -213,9 +210,9 @@ public class AntColonySimulation extends ApplicationAdapter {
 
 				Color color = new Color(red, green, blue);
 				if(color.equals(WALL_COLOR)){
-					world.getCell(y, x).setWall(true);
+					world.getCell(heightPixmap - 1 - y, x).setWall(true);
 				}else if(color.equals(FOOD_COLOR)){
-					world.getCell(y, x).setFoodOnCell(100);
+					world.getCell(heightPixmap - 1 - y, x).setFoodOnCell(100);
 				}
 			}
 		}
