@@ -1,6 +1,6 @@
 ## **Simple ant colony simulator with pheromone trails**
 
-![](assets/ScreenShot.png)
+![](assets/Screenshot.png)
 
 ### Controls:
 | Button/Key | Action                       |
