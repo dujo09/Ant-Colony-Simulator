@@ -11,7 +11,7 @@ import java.util.List;
 public class Colony {
     public static final int ANT_COUNT = 100;
 
-    public static final int COLONY_RADIUS = (int)World.CELL_SIZE * 10;
+    public static final float COLONY_RADIUS = 10f;
 
     public static final float ANT_CREATE_PERIOD = 2f;
     public static final int ANT_CREATE_COST = 100;

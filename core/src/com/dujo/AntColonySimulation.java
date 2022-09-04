@@ -3,21 +3,19 @@ package com.dujo;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.dujo.antcolonysimulator.ant.Ant;
-import com.dujo.antcolonysimulator.ant.Pheromone;
 import com.dujo.antcolonysimulator.colony.Colony;
-import com.dujo.antcolonysimulator.renderer.ColonyRenderer;
 import com.dujo.antcolonysimulator.renderer.MyRenderer;
 import com.dujo.antcolonysimulator.world.World;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 
 public class AntColonySimulation extends ApplicationAdapter {
@@ -37,24 +35,23 @@ public class AntColonySimulation extends ApplicationAdapter {
 
 	@Override
 	public void create(){
-		world = new World();
+		loadWorldFromImage();
 		colonies = new Colony[World.MAX_COLONY_COUNT];
 
 		renderer = new MyRenderer(world);
 
-		spriteSheet = new Texture("spritesheet.png");
+		spriteSheet = new Texture(Gdx.files.internal("spriteSheet.png"));
 		textureRegions = new TextureRegion[8];
 		for(int i = 0; i < 8; ++i){
 			textureRegions[i] = new TextureRegion(spriteSheet, 64 * i, 0, 64, 64);
 		}
+		batch = new SpriteBatch();
 
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera(200, 200 * (h / w));
 		camera.position.set(50f, 50f, 0f);
 		camera.update();
-
-		batch = new SpriteBatch();
 
 		brushSize = 1;
 		isPlaceMode = true;
@@ -194,6 +191,36 @@ public class AntColonySimulation extends ApplicationAdapter {
 			timeScale = 3;
 		}
 
+	}
+
+	private void loadWorldFromImage(){
+		final Color WALL_COLOR = new Color(161, 161, 161);
+		final Color FOOD_COLOR = new Color(13, 255, 0);
+
+		Pixmap worldImage = new Pixmap(Gdx.files.internal("worldMap300x300.png"));
+
+		int widthPixmap = worldImage.getWidth();
+		int heightPixmap = worldImage.getHeight();
+		world = new World(widthPixmap, heightPixmap, 1);
+
+		for(int y=0; y < heightPixmap; y++){
+			for(int x=0; x < widthPixmap; x++){
+				int colorData = worldImage.getPixel(x, y);
+				int red = colorData >>> 24;
+				int green = (colorData & 0xFF0000) >>> 16;
+				int blue = (colorData & 0xFF00) >>> 8;
+				int alpha = colorData & 0xFF;
+
+				Color color = new Color(red, green, blue);
+				if(color.equals(WALL_COLOR)){
+					world.getCell(y, x).setWall(true);
+				}else if(color.equals(FOOD_COLOR)){
+					world.getCell(y, x).setFoodOnCell(100);
+				}
+			}
+		}
+
+		worldImage.dispose();
 	}
 	
 	@Override

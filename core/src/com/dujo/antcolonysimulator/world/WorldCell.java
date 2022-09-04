@@ -8,14 +8,16 @@ import java.awt.geom.Point2D;
 public class WorldCell {
     private final int row;
     private final int column;
+    private final float cellSize;
     private boolean isWall;
     private int food;
     private final float[][] colonyPheromones;
     private boolean isEmpty;
 
-    public WorldCell(int row, int column){
+    public WorldCell(int row, int column, float cellSize){
         this.row = row;
         this.column = column;
+        this.cellSize = cellSize;
 
         colonyPheromones = new float[World.MAX_COLONY_COUNT][Pheromone.values().length];
     }
@@ -48,8 +50,8 @@ public class WorldCell {
 
     public Point2D.Float getCellCenter(){
         return new Point2D.Float(
-                column * World.CELL_SIZE - World.CELL_SIZE / 2f,
-                row * World.CELL_SIZE - World.CELL_SIZE / 2f
+                column * cellSize - cellSize / 2f,
+                row * cellSize - cellSize / 2f
         );
     }
 
@@ -60,7 +62,7 @@ public class WorldCell {
     public void setPheromoneOnCell(Pheromone pheromone, float intensity, int colonyID){
         if(!isWall) {
             if (pheromone == Pheromone.REPELLENT) {
-                intensity = MathUtils.clamp(intensity, 0f, World.MAX_REPELENT_INTENSITY);
+                intensity = MathUtils.clamp(intensity, 0f, World.MAX_REPELLENT_INTENSITY);
             } else {
                 intensity = MathUtils.clamp(intensity, 0f, World.MAX_PHEROMONE_INTENSITY);
             }

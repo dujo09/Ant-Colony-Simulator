@@ -17,18 +17,19 @@ public class WorldRenderer {
                 boolean[] renderColonies,
                 boolean renderToColonyPheromones, boolean renderToFoodPheromones, boolean renderRepellentPheromones) {
         WorldCell[] cells = world.getCells();
-        for (int i = 0; i < World.COLUMN_COUNT * World.ROW_COUNT; ++i) {
+        for (int i = 0; i < world.getColumnCount() * world.getRowCount(); ++i) {
 
             if (!cells[i].isEmpty()) {
                 batch.setColor(1f, 1f, 1f, 1f);
+
                 // Draw wall if on cell
                 if (cells[i].isWall()) {
                     batch.draw(
                             textureRegions[7],
-                            cells[i].getColumn() * World.CELL_SIZE,
-                            cells[i].getRow() * World.CELL_SIZE,
-                            World.CELL_SIZE,
-                            World.CELL_SIZE
+                            cells[i].getColumn() * world.getCellSize(),
+                            cells[i].getRow() * world.getCellSize(),
+                            world.getCellSize(),
+                            world.getCellSize()
                     );
                     continue;
                 }
@@ -38,10 +39,10 @@ public class WorldRenderer {
                     batch.setColor(1f, 1f, 1f, cells[i].getFoodOnCell() / World.MAX_FOOD_ON_CELL);
                     batch.draw(
                             textureRegions[6],
-                            cells[i].getColumn() * World.CELL_SIZE,
-                            cells[i].getRow() * World.CELL_SIZE,
-                            World.CELL_SIZE,
-                            World.CELL_SIZE
+                            cells[i].getColumn() * world.getCellSize(),
+                            cells[i].getRow() * world.getCellSize(),
+                            world.getCellSize(),
+                            world.getCellSize()
                     );
                     continue;
                 }
@@ -57,10 +58,10 @@ public class WorldRenderer {
                     batch.setColor(1f, 1f, 1f, intensity / World.MAX_PHEROMONE_INTENSITY);
                     batch.draw(
                             textureRegions[3],
-                            cells[i].getColumn() * World.CELL_SIZE,
-                            cells[i].getRow() * World.CELL_SIZE,
-                            World.CELL_SIZE,
-                            World.CELL_SIZE
+                            cells[i].getColumn() * world.getCellSize(),
+                            cells[i].getRow() * world.getCellSize(),
+                            world.getCellSize(),
+                            world.getCellSize()
                     );
                 }
 
@@ -75,10 +76,10 @@ public class WorldRenderer {
                     batch.setColor(1f, 1f, 1f, intensity / World.MAX_PHEROMONE_INTENSITY);
                     batch.draw(
                             textureRegions[4],
-                            cells[i].getColumn() * World.CELL_SIZE,
-                            cells[i].getRow() * World.CELL_SIZE,
-                            World.CELL_SIZE,
-                            World.CELL_SIZE
+                            cells[i].getColumn() * world.getCellSize(),
+                            cells[i].getRow() * world.getCellSize(),
+                            world.getCellSize(),
+                            world.getCellSize()
                     );
                 }
 
@@ -90,18 +91,17 @@ public class WorldRenderer {
                             intensity += cells[i].getPheromoneOnCell(Pheromone.REPELLENT, j);
                         }
                     }
-                    batch.setColor(1f, 1f, 1f, intensity / World.MAX_REPELENT_INTENSITY);
+                    batch.setColor(1f, 1f, 1f, intensity / World.MAX_REPELLENT_INTENSITY);
                     batch.draw(
                             textureRegions[5],
-                            cells[i].getColumn() * World.CELL_SIZE,
-                            cells[i].getRow() * World.CELL_SIZE,
-                            World.CELL_SIZE,
-                            World.CELL_SIZE
+                            cells[i].getColumn() * world.getCellSize(),
+                            cells[i].getRow() * world.getCellSize(),
+                            world.getCellSize(),
+                            world.getCellSize()
                     );
                 }
 
                 batch.setColor(1f, 1f, 1f, 1f);
-
             }
         }
     }

@@ -1,43 +1,43 @@
 package com.dujo.antcolonysimulator.world;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.ant.Pheromone;
-import com.dujo.antcolonysimulator.colony.Colony;
 import com.dujo.antcolonysimulator.common.Cooldown;
 
 import java.awt.geom.Point2D;
 
 public class World {
     public static final int MAX_COLONY_COUNT = 3;
-    public static final float MAX_PHEROMONE_INTENSITY = 100f;
-    public static final float MAX_REPELENT_INTENSITY = 200f;
-    public static final float MAX_FOOD_ON_CELL = 100f;
+    public static final float MAX_PHEROMONE_INTENSITY = 100.0f;
+    public static final float MAX_REPELLENT_INTENSITY = 200.0f;
+    public static final float MAX_FOOD_ON_CELL = 100.0f;
 
-    public static final int COLUMN_COUNT = 300;
-    public static final int ROW_COUNT = 300;
-    public static final float CELL_SIZE = 1;
+    public static float PHEROMONE_DEGRADE_PERIOD = 1.0f;
 
-    public static float PHEROMONE_DEGRADE_PERIOD = 0.25f;
-
+    private final int columnCount;
+    private final int rowCount;
+    private final float cellSize;
     private final WorldCell[] cells;
     private final Cooldown pheromoneDegradeCooldown;
 
-    public World(){
-        cells = new WorldCell[ROW_COUNT * COLUMN_COUNT];
+    public World(int columnCount, int rowCount, int cellSize){
+        this.rowCount = rowCount;
+        this.columnCount = columnCount;
+        this.cellSize = cellSize;
+
+        cells = new WorldCell[rowCount * columnCount];
 
         pheromoneDegradeCooldown = new Cooldown(PHEROMONE_DEGRADE_PERIOD);
 
-        for(int i = 0; i < ROW_COUNT * COLUMN_COUNT; ++i){
-            int row = i / COLUMN_COUNT;
-            int column = i % COLUMN_COUNT;
+        for(int i = 0; i < rowCount * columnCount; ++i){
+            int row = i / columnCount;
+            int column = i % columnCount;
 
-            cells[i] = new WorldCell(row, column);
+            cells[i] = new WorldCell(row, column, cellSize);
 
             // Create wall border around whole world
-            if(row == 0 || row == 1 || row == ROW_COUNT - 1 || row == ROW_COUNT - 2 ||
-                    column == 0 || column == 1 || column == COLUMN_COUNT - 1 || column == COLUMN_COUNT - 2){
+            if(row == 0 || row == 1 || row == rowCount - 1 || row == rowCount - 2 ||
+                    column == 0 || column == 1 || column == columnCount - 1 || column == columnCount - 2){
                 cells[i].setWall(true);
             }
         }
@@ -46,7 +46,7 @@ public class World {
     public void update(float deltaTime){
         pheromoneDegradeCooldown.update(deltaTime);
 
-        for(int i = 0; i < ROW_COUNT * COLUMN_COUNT; ++i){
+        for(int i = 0; i < rowCount * columnCount; ++i){
             cells[i].update();
             if(pheromoneDegradeCooldown.isReady()){
                 cells[i].degradePheromone(0.99f);
@@ -70,20 +70,20 @@ public class World {
     public Collision getFirstCollision(Point2D.Float position, float directionAngle, float targetDistance){
         Collision collision = new Collision(targetDistance);
 
-        int column = (int) (position.x  / CELL_SIZE);
-        int row = (int) (position.y / CELL_SIZE);
+        int column = (int) (position.x  / cellSize);
+        int row = (int) (position.y / cellSize);
         Vector2 directionVector = new Vector2((float) Math.cos(directionAngle), (float) Math.sin(directionAngle));
 
         Vector2 stepVector =
                 new Vector2(directionVector.x > 0f ? 1f : -1f , directionVector.y > 0f ? 1f : -1f);
 
         float distanceVertical =
-                ((column + (stepVector.x > 0f ? 1f : 0f)) * CELL_SIZE - position.x) / directionVector.x;
+                ((column + (stepVector.x > 0f ? 1f : 0f)) * cellSize - position.x) / directionVector.x;
         float distanceHorizontal =
-                ((row + (stepVector.y > 0f ? 1f : 0f)) * CELL_SIZE - position.y) / directionVector.y;
+                ((row + (stepVector.y > 0f ? 1f : 0f)) * cellSize - position.y) / directionVector.y;
 
-        float deltaX = Math.abs(CELL_SIZE / directionVector.x);
-        float deltaY = Math.abs(CELL_SIZE / directionVector.y);
+        float deltaX = Math.abs(cellSize / directionVector.x);
+        float deltaY = Math.abs(cellSize / directionVector.y);
         float distance = 0f;
 
         while(distance < targetDistance){
@@ -147,18 +147,18 @@ public class World {
             return;
         }
 
-        int startRow = (int) (point.y / CELL_SIZE - size / 2);
-        int endRow = (int) (point.y / CELL_SIZE + size / 2);
-        int startColumn = (int) (point.x / CELL_SIZE - size / 2);
-        int endColumn = (int) (point.x / CELL_SIZE + size / 2);
+        int startRow = (int) (point.y / cellSize - size / 2);
+        int endRow = (int) (point.y / cellSize + size / 2);
+        int startColumn = (int) (point.x / cellSize - size / 2);
+        int endColumn = (int) (point.x / cellSize + size / 2);
 
         for(int i = startRow; i < endRow; ++i){
-            if(i < 0 || i >= ROW_COUNT){
+            if(i < 0 || i >= rowCount){
                 continue;
             }
 
             for(int j = startColumn; j < endColumn; ++j){
-                if(j < 0 || j >= COLUMN_COUNT){
+                if(j < 0 || j >= columnCount){
                     continue;
                 }
 
@@ -177,18 +177,18 @@ public class World {
             return;
         }
 
-        int startRow = (int) (point.y / CELL_SIZE - size / 2);
-        int endRow = (int) (point.y / CELL_SIZE + size / 2);
-        int startColumn = (int) (point.x / CELL_SIZE - size / 2);
-        int endColumn = (int) (point.x / CELL_SIZE + size / 2);
+        int startRow = (int) (point.y / cellSize - size / 2);
+        int endRow = (int) (point.y / cellSize + size / 2);
+        int startColumn = (int) (point.x / cellSize - size / 2);
+        int endColumn = (int) (point.x / cellSize + size / 2);
 
         for(int i = startRow; i < endRow; ++i){
-            if(i < 0 || i >= ROW_COUNT){
+            if(i < 0 || i >= rowCount){
                 continue;
             }
 
             for(int j = startColumn; j < endColumn; ++j){
-                if(j < 0 || j >= COLUMN_COUNT){
+                if(j < 0 || j >= columnCount){
                     continue;
                 }
 
@@ -207,18 +207,18 @@ public class World {
             return;
         }
 
-        int startRow = (int) (point.y / CELL_SIZE - size / 2);
-        int endRow = (int) (point.y / CELL_SIZE + size / 2);
-        int startColumn = (int) (point.x / CELL_SIZE - size / 2);
-        int endColumn = (int) (point.x / CELL_SIZE + size / 2);
+        int startRow = (int) (point.y / cellSize - size / 2);
+        int endRow = (int) (point.y / cellSize + size / 2);
+        int startColumn = (int) (point.x / cellSize - size / 2);
+        int endColumn = (int) (point.x / cellSize + size / 2);
 
         for(int i = startRow; i < endRow; ++i){
-            if(i < 0 || i >= ROW_COUNT){
+            if(i < 0 || i >= rowCount){
                 continue;
             }
 
             for(int j = startColumn; j < endColumn; ++j){
-                if(j < 0 || j >= COLUMN_COUNT){
+                if(j < 0 || j >= columnCount){
                     continue;
                 }
                 WorldCell cell = getCell(i, j);
@@ -233,18 +233,18 @@ public class World {
             return;
         }
 
-        int startRow = (int) (point.y / CELL_SIZE - size / 2);
-        int endRow = (int) (point.y / CELL_SIZE + size / 2);
-        int startColumn = (int) (point.x / CELL_SIZE - size / 2);
-        int endColumn = (int) (point.x / CELL_SIZE + size / 2);
+        int startRow = (int) (point.y / cellSize - size / 2);
+        int endRow = (int) (point.y / cellSize + size / 2);
+        int startColumn = (int) (point.x / cellSize - size / 2);
+        int endColumn = (int) (point.x / cellSize + size / 2);
 
         for(int i = startRow; i < endRow; ++i){
-            if(i < 0 || i >= ROW_COUNT){
+            if(i < 0 || i >= rowCount){
                 continue;
             }
 
             for(int j = startColumn; j < endColumn; ++j){
-                if(j < 0 || j >= COLUMN_COUNT){
+                if(j < 0 || j >= columnCount){
                     continue;
                 }
                 WorldCell cell = getCell(i, j);
@@ -259,21 +259,32 @@ public class World {
     }
 
     public WorldCell getCell(Point2D.Float point) {
-        return cells[(int) (point.y / CELL_SIZE) * COLUMN_COUNT + (int) (point.x / CELL_SIZE)];
+        return cells[(int) (point.y / cellSize) * columnCount + (int) (point.x / cellSize)];
     }
 
     public WorldCell getCell(int row, int column){
-        return cells[row * COLUMN_COUNT + column];
+        return cells[row * columnCount + column];
     }
 
     public boolean checkCell(int row, int column){
-        int index = row * COLUMN_COUNT + column;
-        return index < 0 || index >= ROW_COUNT * COLUMN_COUNT;
+        int index = row * columnCount + column;
+        return index < 0 || index >= rowCount * columnCount;
     }
 
-    public static boolean isPointOutOfBounds(Point2D.Float point){
-        return point.x < 0f || point.x >= COLUMN_COUNT * CELL_SIZE ||
-                point.y < 0f || point.y >= ROW_COUNT * CELL_SIZE;
+    public boolean isPointOutOfBounds(Point2D.Float point){
+        return point.x < 0f || point.x >= columnCount * cellSize ||
+                point.y < 0f || point.y >= rowCount * cellSize;
     }
 
+    public int getColumnCount() {
+        return columnCount;
+    }
+
+    public int getRowCount() {
+        return rowCount;
+    }
+
+    public float getCellSize() {
+        return cellSize;
+    }
 }

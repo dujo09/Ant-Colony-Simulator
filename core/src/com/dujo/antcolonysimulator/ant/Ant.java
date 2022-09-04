@@ -18,8 +18,9 @@ public class Ant {
     public static final float ANT_SIZE = 4f;
     public static final float ANT_VIEW_ANGLE = (float) (Math.PI);
     public static final float DELTA_VIEW_ANGLE = ANT_VIEW_ANGLE / 3; // View angle is split into 3 parts: left, right and center
+    public static final int TOTAL_SAMPLE_COUNT = 100;
     public static final float ANT_VIEW_RANGE = ANT_SIZE * 10f;
-    public static final float ANT_PICKUP_RANGE = World.CELL_SIZE * 2;
+    public static final float ANT_PICKUP_RANGE = 2f;
     public static final int MAX_FOOD_CARRY = 10;
 
     public static final float ROTATION_PERIOD = 0.25f;
@@ -62,7 +63,7 @@ public class Ant {
     public List<Point2D.Float> samples = new ArrayList<>(); //DEBUG
 
     public void update(float deltaTime){
-        if(World.isPointOutOfBounds(position)){
+        if(world.isPointOutOfBounds(position)){
             return;
         }
 
@@ -74,7 +75,7 @@ public class Ant {
             pheromoneDropCooldown.reset();
 
             world.setPheromone(position, pheromone, pheromoneIntensity, colony.getIndex());
-            pheromoneIntensity -= 0.5f;
+            pheromoneIntensity *= 0.99f;
             /*if(pheromoneIntensity == 0f){
                 goal = Goal.RETURN_TO_COLONY;
                 pheromone = null;
@@ -112,7 +113,7 @@ public class Ant {
         for(int i = 0; i < 3; ++i) {
             SampleResult sampleResult = new SampleResult(DELTA_VIEW_ANGLE - DELTA_VIEW_ANGLE * i);
             List<SamplePoint> samplePoints = getSamplePoints(
-                    20,
+                    TOTAL_SAMPLE_COUNT / 3,
                     ANT_VIEW_ANGLE / 3, ANT_VIEW_RANGE,
                     sampleResult.angleOffset
             );
@@ -203,7 +204,7 @@ public class Ant {
 
                         goal = Goal.REPEL_FROM_TRAIL;
                         pheromone = null;
-                        pheromoneIntensity = World.MAX_REPELENT_INTENSITY;
+                        pheromoneIntensity = World.MAX_REPELLENT_INTENSITY;
                         boolean setRepellent = true;
 
                         for (SamplePoint samplePoint : getSamplePoints(
@@ -227,6 +228,7 @@ public class Ant {
 
                         direction.setGoalPoint(null);
                         direction.setCurrentVector(direction.getCurrentVectorOpposite());
+                        direction.setTargetVector(direction.getCurrentVectorOpposite());
                     }
                 }else{
                     direction.setGoalPoint(null);
@@ -243,6 +245,7 @@ public class Ant {
 
                     direction.setGoalPoint(null);
                     direction.setCurrentVector(direction.getCurrentVectorOpposite());
+                    direction.setTargetVector(direction.getCurrentVectorOpposite());
                 }
             }
         }
@@ -299,7 +302,7 @@ public class Ant {
                     (float) Math.sin(angle) * scalar + position.y
             );
 
-            if(!World.isPointOutOfBounds(point)){
+            if(!world.isPointOutOfBounds(point)){
                 pointList.add(new SamplePoint(point, scalar));
             }
         }
