@@ -4,6 +4,9 @@ where they found food or where their base is. Blue dots represent "to colony" ph
 green ones represent "to food" pheromones. When ants deplete a food source they will lay a
 repellent and degrade any pheromone trails leading to that depleted food source to deter other
 ants from venturing there.
+\
+\
+**This project is coded in Java and uses LibGdx for rendering**
 
 ![](assets/Screenshot.png)
 
