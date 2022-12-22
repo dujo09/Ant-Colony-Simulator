@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.colony.Colony;
 import com.dujo.antcolonysimulator.renderer.MyRenderer;
 import com.dujo.antcolonysimulator.world.World;
@@ -44,7 +43,7 @@ public class AntColonySimulation extends ApplicationAdapter {
 	private Texture spriteSheet;
 	private TextureRegion[] textureRegions;
 	private int brushSize;
-	private boolean isPlaceMode;
+	private boolean isRemoveToolSelected;
 	private boolean isFoodSelected;
 
 
@@ -72,7 +71,7 @@ public class AntColonySimulation extends ApplicationAdapter {
 
 		// Setup misc
 		brushSize = 1;
-		isPlaceMode = true;
+		isRemoveToolSelected = true;
 		isFoodSelected = true;
 		timeScale = 1;
 	}
@@ -102,6 +101,7 @@ public class AntColonySimulation extends ApplicationAdapter {
 		}
 
 	private void handleInput(){
+		// Camera translation
 		if(Gdx.input.isKeyPressed(Input.Keys.A)){
 			camera.translate(-3f, 0f, 0f);
 		}
@@ -114,12 +114,16 @@ public class AntColonySimulation extends ApplicationAdapter {
 		if(Gdx.input.isKeyPressed(Input.Keys.W)){
 			camera.translate(0f, 3f, 0f);
 		}
+
+		// Zoom
 		if(Gdx.input.isKeyPressed(Input.Keys.Q)){
 			camera.zoom -= 0.03;
 		}
 		if(Gdx.input.isKeyPressed(Input.Keys.E)){
 			camera.zoom += 0.03;
 		}
+
+		// Brush size
 		if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
 			brushSize += 1f;
 			brushSize = MathUtils.clamp(brushSize, 1, 50);
@@ -128,38 +132,32 @@ public class AntColonySimulation extends ApplicationAdapter {
 			brushSize -= 1f;
 			brushSize = MathUtils.clamp(brushSize, 1, 50);
 		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.F)){
-			isFoodSelected = true;
-		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.V)){
-			isFoodSelected = false;
-		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
-			isPlaceMode = false;
-		}
-		if(Gdx.input.isKeyJustPressed(Input.Keys.T)){
-			isPlaceMode = true;
-		}
+
+		// Placing/removing wall/food
+		isRemoveToolSelected = Gdx.input.isKeyPressed(Input.Keys.R);
 		if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
 			Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
 			camera.unproject(touchPosition);
 			Point2D.Float touchPosition2D = new Point2D.Float(touchPosition.x, touchPosition.y);
 
-			if(isFoodSelected){
-				if(isPlaceMode){
-					world.setFood(touchPosition2D, 100, brushSize);
-				}else{
-					world.removeFood(touchPosition2D, brushSize);
-				}
-			}else {
-				if(isPlaceMode){
-					world.setWall(touchPosition2D, brushSize);
-				}else{
-					world.removeWall(touchPosition2D, brushSize);
-				}
-			}
+			if(isRemoveToolSelected)
+				world.removeWall(touchPosition2D, brushSize);
+			else
+				world.setWall(touchPosition2D, brushSize);
 		}
-		if(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
+		if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+			Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
+			camera.unproject(touchPosition);
+			Point2D.Float touchPosition2D = new Point2D.Float(touchPosition.x, touchPosition.y);
+
+			if(isRemoveToolSelected)
+				world.removeFood(touchPosition2D, brushSize);
+			else
+				world.setFood(touchPosition2D, 100, brushSize);
+		}
+
+		// Place colonies
+		if(Gdx.input.isButtonJustPressed(Input.Buttons.MIDDLE)){
 			if(colonies.size() < World.MAX_COLONY_COUNT) {
 				Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
 				camera.unproject(touchPosition);
@@ -170,6 +168,8 @@ public class AntColonySimulation extends ApplicationAdapter {
 				renderer.addColony(newColony);
 			}
 		}
+
+		// Toggle rendering
 		if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
 			renderer.toggleColonyRendering(0);
 		}
@@ -188,6 +188,8 @@ public class AntColonySimulation extends ApplicationAdapter {
 		if(Gdx.input.isKeyJustPressed(Input.Keys.C)){
 			renderer.toggleAntRendering();
 		}
+
+		// Time scaling
 		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
 			isPaused = !isPaused;
 		}
@@ -227,7 +229,7 @@ public class AntColonySimulation extends ApplicationAdapter {
 				else if(color.equals(FOOD_COLOR))
 					world.getCell(heightPixmap - 1 - y, x).setFoodOnCell(20);
 			}
-		
+
 		worldImage.dispose();
 	}
 

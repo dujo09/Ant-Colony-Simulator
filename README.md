@@ -11,11 +11,13 @@
 | C          | toggle ants                  |
 | HJK        | toggle colonies              |
 | 123 Space  | Time scale                   |
-| FV         | Select food/wall             |
-| RT         | Select remove/place tool     |
 | PL         | increase/decrease brush size |
-| RMB        | place colony                 |
-| LMB        | place food/wall              |
+| MMB        | place colony                 |
+| LMB        | place wall                   |
+| LMB + R    | remove wall                  |
+| RMB        | place food                   |
+| RMB + R    | remove food                  |
 
 ### References
-[johnBuffer GitHub AntSimulator](https://github.com/johnBuffer/AntSimulator)
+[johnBuffer AntSimulator](https://github.com/johnBuffer/AntSimulator)\
+[Sebastian Lague Ant Simulation](https://www.youtube.com/watch?v=X-iSQQgOd1A&t=508s)
