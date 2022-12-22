@@ -1,10 +1,11 @@
 package com.dujo.antcolonysimulator.world;
 
 import com.badlogic.gdx.math.Vector2;
-import com.dujo.antcolonysimulator.ant.Pheromone;
+import com.dujo.antcolonysimulator.ant.AntPheromone;
 import com.dujo.antcolonysimulator.common.Cooldown;
 
 import java.awt.geom.Point2D;
+
 
 public class World {
     public static final int MAX_COLONY_COUNT = 3;
@@ -14,10 +15,11 @@ public class World {
 
     public static float PHEROMONE_DEGRADE_PERIOD = 1.0f;
 
+
     private final int columnCount;
     private final int rowCount;
     private final float cellSize;
-    private final WorldCell[] cells;
+    private final WorldCell[] cellsArray;
     private final Cooldown pheromoneDegradeCooldown;
 
     public World(int columnCount, int rowCount, int cellSize){
@@ -25,7 +27,7 @@ public class World {
         this.columnCount = columnCount;
         this.cellSize = cellSize;
 
-        cells = new WorldCell[rowCount * columnCount];
+        cellsArray = new WorldCell[rowCount * columnCount];
 
         pheromoneDegradeCooldown = new Cooldown(PHEROMONE_DEGRADE_PERIOD);
 
@@ -33,40 +35,23 @@ public class World {
             int row = i / columnCount;
             int column = i % columnCount;
 
-            cells[i] = new WorldCell(row, column, cellSize);
+            cellsArray[i] = new WorldCell(row, column, cellSize);
 
             // Create wall border around whole world
             if(row == 0 || row == 1 || row == rowCount - 1 || row == rowCount - 2 ||
-                    column == 0 || column == 1 || column == columnCount - 1 || column == columnCount - 2){
-                cells[i].setWall(true);
-            }
+                    column == 0 || column == 1 || column == columnCount - 1 || column == columnCount - 2)
+                cellsArray[i].setWall(true);
         }
     }
 
     public void update(float deltaTime){
         pheromoneDegradeCooldown.update(deltaTime);
 
-        for(int i = 0; i < rowCount * columnCount; ++i){
-            cells[i].update();
-            if(pheromoneDegradeCooldown.isReady()){
-                cells[i].degradePheromone(0.99f);
-            }
-        }
-
-        if(pheromoneDegradeCooldown.isReady()){
-            pheromoneDegradeCooldown.reset();
-        }
-
+        if(pheromoneDegradeCooldown.isReadyAutoReset())
+            for (int i = 0; i < rowCount * columnCount; ++i)
+                cellsArray[i].degradeAllPheromonesOnCell(0.99f);
     }
 
-    /**
-     * Method for getting the first collision in a direction
-     *
-     * @param position the current position of the Ant
-     * @param directionAngle the current angle of the Ant
-     * @param targetDistance the target distance of the Ant
-     * @return null if no collision, a collision otherwise
-     */
     public Collision getFirstCollision(Point2D.Float position, float directionAngle, float targetDistance){
         Collision collision = new Collision(targetDistance);
 
@@ -107,32 +92,13 @@ public class World {
 
     }
 
-    public float getPheromone(Point2D.Float point, Pheromone pheromone, int colonyID){
-        return getCell(point).getPheromoneOnCell(pheromone, colonyID);
-    }
-
-    public void setPheromone(Point2D.Float point, Pheromone pheromone, float intensity, int colonyID){
+    public void setPheromone(Point2D.Float point, AntPheromone pheromone, float intensity, int colonyID){
         getCell(point).setPheromoneOnCell(pheromone, intensity, colonyID);
-
-    }
-
-    public void degradePheromone(Point2D.Float point, Pheromone pheromone, float ratio, int colonyID){
-        getCell(point).degradePheromone(pheromone, ratio, colonyID);
     }
 
     public void degradePheromone(Point2D.Float point, float ratio){
-        getCell(point).degradePheromone(ratio);
+        getCell(point).degradeAllPheromonesOnCell(ratio);
     }
-
-    public int getFood(Point2D.Float point){
-        return getCell(point).getFoodOnCell();
-
-    }
-
-    public void setFood(Point2D.Float point, int food){
-        getCell(point).setFoodOnCell(food);
-    }
-
 
     public int takeFood(Point2D.Float point, int amount){
         return getCell(point).takeFoodOnCell(amount);
@@ -142,15 +108,15 @@ public class World {
         return getCell(point).isFoodOnCell();
     }
 
-    public void setFood(Point2D.Float point, int food, float size){
+    public void setFood(Point2D.Float point, int food, float brushSize){
         if(isPointOutOfBounds(point)){
             return;
         }
 
-        int startRow = (int) (point.y / cellSize - size / 2);
-        int endRow = (int) (point.y / cellSize + size / 2);
-        int startColumn = (int) (point.x / cellSize - size / 2);
-        int endColumn = (int) (point.x / cellSize + size / 2);
+        int startRow = (int) (point.y / cellSize - brushSize / 2);
+        int endRow = (int) (point.y / cellSize + brushSize / 2);
+        int startColumn = (int) (point.x / cellSize - brushSize / 2);
+        int endColumn = (int) (point.x / cellSize + brushSize / 2);
 
         for(int i = startRow; i < endRow; ++i){
             if(i < 0 || i >= rowCount){
@@ -172,15 +138,15 @@ public class World {
         }
 
     }
-    public void removeFood(Point2D.Float point, float size){
+    public void removeFood(Point2D.Float point, float brushSize){
         if(isPointOutOfBounds(point)){
             return;
         }
 
-        int startRow = (int) (point.y / cellSize - size / 2);
-        int endRow = (int) (point.y / cellSize + size / 2);
-        int startColumn = (int) (point.x / cellSize - size / 2);
-        int endColumn = (int) (point.x / cellSize + size / 2);
+        int startRow = (int) (point.y / cellSize - brushSize / 2);
+        int endRow = (int) (point.y / cellSize + brushSize / 2);
+        int startColumn = (int) (point.x / cellSize - brushSize / 2);
+        int endColumn = (int) (point.x / cellSize + brushSize / 2);
 
         for(int i = startRow; i < endRow; ++i){
             if(i < 0 || i >= rowCount){
@@ -202,15 +168,15 @@ public class World {
         }
 
     }
-    public void setWall(Point2D.Float point, float size){
+    public void setWall(Point2D.Float point, float brushSize){
         if(isPointOutOfBounds(point)){
             return;
         }
 
-        int startRow = (int) (point.y / cellSize - size / 2);
-        int endRow = (int) (point.y / cellSize + size / 2);
-        int startColumn = (int) (point.x / cellSize - size / 2);
-        int endColumn = (int) (point.x / cellSize + size / 2);
+        int startRow = (int) (point.y / cellSize - brushSize / 2);
+        int endRow = (int) (point.y / cellSize + brushSize / 2);
+        int startColumn = (int) (point.x / cellSize - brushSize / 2);
+        int endColumn = (int) (point.x / cellSize + brushSize / 2);
 
         for(int i = startRow; i < endRow; ++i){
             if(i < 0 || i >= rowCount){
@@ -228,15 +194,15 @@ public class World {
         }
 
     }
-    public void removeWall(Point2D.Float point, float size){
+    public void removeWall(Point2D.Float point, float brushSize){
         if(isPointOutOfBounds(point)){
             return;
         }
 
-        int startRow = (int) (point.y / cellSize - size / 2);
-        int endRow = (int) (point.y / cellSize + size / 2);
-        int startColumn = (int) (point.x / cellSize - size / 2);
-        int endColumn = (int) (point.x / cellSize + size / 2);
+        int startRow = (int) (point.y / cellSize - brushSize / 2);
+        int endRow = (int) (point.y / cellSize + brushSize / 2);
+        int startColumn = (int) (point.x / cellSize - brushSize / 2);
+        int endColumn = (int) (point.x / cellSize + brushSize / 2);
 
         for(int i = startRow; i < endRow; ++i){
             if(i < 0 || i >= rowCount){
@@ -255,15 +221,15 @@ public class World {
     }
 
     public WorldCell[] getCells() {
-        return cells;
+        return cellsArray;
     }
 
     public WorldCell getCell(Point2D.Float point) {
-        return cells[(int) (point.y / cellSize) * columnCount + (int) (point.x / cellSize)];
+        return cellsArray[(int) (point.y / cellSize) * columnCount + (int) (point.x / cellSize)];
     }
 
     public WorldCell getCell(int row, int column){
-        return cells[row * columnCount + column];
+        return cellsArray[row * columnCount + column];
     }
 
     public boolean checkCell(int row, int column){

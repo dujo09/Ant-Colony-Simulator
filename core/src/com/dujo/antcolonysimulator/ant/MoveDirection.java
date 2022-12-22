@@ -1,18 +1,17 @@
 package com.dujo.antcolonysimulator.ant;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 
 import java.awt.geom.Point2D;
 
-public class Direction {
+public class MoveDirection {
     private float currentAngle;
     private float targetAngle;
     private Vector2 currentVector;
     private Vector2 targetVector;
     private Point2D.Float goalPoint;
 
-    public Direction(){
+    public MoveDirection(){
         currentVector = new Vector2(
                 (float) Math.cos(currentAngle),
                 (float) Math.sin(currentAngle)
@@ -27,66 +26,11 @@ public class Direction {
     }
 
     public void rotate(float deltaTime, float rotateSpeed){
-        /*Vector2 directionNormalVector = new Vector2(-currentVector.y, currentVector.x);
+        Vector2 directionNormalVector = new Vector2(-currentVector.y, currentVector.x);
 		float directionDelta = new Vector2(targetVector).dot(directionNormalVector);
         float rotationAngle = rotateSpeed * directionDelta * deltaTime;
 
-        setCurrentAngle(currentAngle + rotationAngle);*/
-
-        int moveDirection = 0;
-        float currentAngleOpposite = getCurrentVectorOpposite().angleRad();
-        float angleDifference = 0f;
-
-        if(targetAngle == currentAngle){
-            return;
-        }else if(currentAngle >= 0f) {
-            if (targetAngle >= 0f) {
-                if(targetAngle > currentAngle){
-                    moveDirection = 1;
-                    angleDifference = targetAngle - currentAngle;
-                }else{
-                    moveDirection = -1;
-                    angleDifference = currentAngle - targetAngle;
-                }
-            }else{
-                if (targetAngle < currentAngleOpposite) {
-                    moveDirection = 1;
-                } else {
-                    moveDirection = -1;
-                }
-                angleDifference = ((float)(2 * Math.PI)) + targetAngle - currentAngle;
-            }
-        } else {
-            if(targetAngle < 0f) {
-                if(targetAngle > currentAngle){
-                    moveDirection = 1;
-                    angleDifference = -currentAngle + targetAngle;
-                }else{
-                    moveDirection = -1;
-                    angleDifference = -targetAngle + currentAngle;
-                }
-            }else{
-                if (targetAngle > currentAngleOpposite) {
-                    moveDirection = -1;
-                } else {
-                    moveDirection = 1;
-                }
-                angleDifference = (float)(2 * Math.PI) + currentAngle - targetAngle;
-            }
-        }
-        float rotationAngle = rotateSpeed * deltaTime;
-        if(rotationAngle > angleDifference){
-            rotationAngle = angleDifference;
-        }
-        rotationAngle *= moveDirection;
-        /*Gdx.app.log("Angles",
-                "DIff: " + (int) Math.toDegrees(angleDifference) +
-                        " Rotation: " + (int) Math.toDegrees(rotationAngle) +
-                        " Current: " + (int) Math.toDegrees(currentAngle) +
-                        " Target: " + (int) Math.toDegrees(targetAngle));*/
-
         setCurrentAngle(currentAngle + rotationAngle);
-
     }
 
     public float getCurrentAngle(){
@@ -147,12 +91,10 @@ public class Direction {
     }
 
     public void setRandomTarget(){
-        //float randomAngle = (float) (Math.random() * Ant.ANT_VIEW_ANGLE - Ant.ANT_VIEW_ANGLE / 2f);
-        if(Math.random() > 0.5f){
+        if(Math.random() > 0.5f)
             setTargetAngle(currentAngle + (float)(Math.PI / 6));
-        }else {
+        else
             setTargetAngle(currentAngle - (float)(Math.PI / 6));
-        }
     }
 
 }

@@ -1,31 +1,43 @@
 package com.dujo.antcolonysimulator.common;
 
+/**
+ * Class that holds a value and a target value, updating means incrementing
+ * the current value, used for limiting how often something happens (like
+ * how often an ant drops a pheromone
+ */
 public class Cooldown {
-    private float value;
-    private final float target;
+    private float currentValue;
+    private final float targetValue;
 
-    public Cooldown(float target){
-        value = 0;
-        this.target = target;
+    public Cooldown(float targetValue){
+        currentValue = 0;
+        this.targetValue = targetValue;
 
     }
 
     public void update(float deltaTime){
-        value += deltaTime;
+        currentValue += deltaTime;
 
     }
 
     public boolean isReady(){
-        return value >= target;
+        return currentValue >= targetValue;
 
+    }
+
+    public boolean isReadyAutoReset(){
+        if(currentValue < targetValue)
+            return false;
+        currentValue = 0f;
+        return true;
     }
 
     public void reset(){
-        value = 0f;
+        currentValue = 0f;
     }
 
     public void block(float time){
-        value -= time;
+        currentValue -= time;
     }
 
 }

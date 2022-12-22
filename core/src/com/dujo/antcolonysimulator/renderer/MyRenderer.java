@@ -22,7 +22,6 @@ public class MyRenderer {
     private boolean renderAnts;
     private boolean renderToColonyPheromones;
     private boolean renderToFoodPheromones;
-    private boolean renderRepellentPheromones;
 
     public MyRenderer(World world){
         colonyRenderers = new ColonyRenderer[World.MAX_COLONY_COUNT];
@@ -33,31 +32,28 @@ public class MyRenderer {
         renderAnts = true;
         renderToColonyPheromones = true;
         renderToFoodPheromones = true;
-        renderRepellentPheromones = true;
-
     }
 
-    public void render(SpriteBatch batch, TextureRegion[] textureRegions){
+    public void render(SpriteBatch spriteBatch, TextureRegion[] textureRegions){
         worldRenderer.render(
-                batch, textureRegions,
+                spriteBatch, textureRegions,
                 renderColonies,
-                renderToColonyPheromones, renderToFoodPheromones, renderRepellentPheromones
+                renderToColonyPheromones, renderToFoodPheromones
         );
 
         for(int i = 0; i < colonyRenderers.length; ++i){
             if(colonyRenderers[i] != null && renderColonies[i]) {
-                colonyRenderers[i].render(batch, textureRegions);
+                colonyRenderers[i].render(spriteBatch, textureRegions);
 
-                if (renderAnts) {
-                    colonyRenderers[i].renderAnts(batch, textureRegions);
-                }
+                if (renderAnts)
+                    colonyRenderers[i].renderAnts(spriteBatch, textureRegions);
             }
         }
 
     }
 
     public void addColony(Colony colony){
-        colonyRenderers[colony.getIndex()] = new ColonyRenderer(colony, COLONY_COLORS[colony.getIndex()]);
+        colonyRenderers[colony.getColonyIndex()] = new ColonyRenderer(colony, COLONY_COLORS[colony.getColonyIndex()]);
     }
 
     public void toggleAntRendering(){
@@ -70,10 +66,6 @@ public class MyRenderer {
 
     public void toggleToFoodPheromoneRendering(){
         renderToFoodPheromones = !renderToFoodPheromones;
-    }
-
-    public void toggleRepellentPheromoneRendering(){
-        renderRepellentPheromones = !renderRepellentPheromones;
     }
 
     public void toggleColonyRendering(int index){

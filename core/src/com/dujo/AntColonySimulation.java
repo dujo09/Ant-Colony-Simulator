@@ -11,21 +11,35 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.dujo.antcolonysimulator.ant.Ant;
 import com.dujo.antcolonysimulator.colony.Colony;
 import com.dujo.antcolonysimulator.renderer.MyRenderer;
 import com.dujo.antcolonysimulator.world.World;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AntColonySimulation extends ApplicationAdapter {
+	public enum TEXTURE_INDICES {
+		ANT_TEXTURE_INDEX,
+		HOLDING_FOOD_TEXTURE_INDEX,
+		COLONY_TEXTURE_INDEX,
+		TO_COLONY_PHEROMONE_TEXTURE_INDEX,
+		TO_FOOD_PHEROMONE_TEXTURE_INDEX,
+		REPELLENT_PHEROMONE_TEXTURE_INDEX,
+		FOOD_TEXTURE_INDEX,
+		WALL_TEXTURE_INDEX
+	}
+
+
 	private World world;
-	private Colony[] colonies;
-	private int colonyCount;
+	private List<Colony> colonies;
 	private MyRenderer renderer;
 	private int timeScale;
 	private boolean isPaused;
-	private SpriteBatch batch;
+	private SpriteBatch spriteBatch;
 	private OrthographicCamera camera;
 	private Texture spriteSheet;
 	private TextureRegion[] textureRegions;
@@ -33,32 +47,34 @@ public class AntColonySimulation extends ApplicationAdapter {
 	private boolean isPlaceMode;
 	private boolean isFoodSelected;
 
+
 	@Override
 	public void create(){
 		loadWorldFromImage();
-		colonies = new Colony[World.MAX_COLONY_COUNT];
+		colonies = new ArrayList<>();
 
 		renderer = new MyRenderer(world);
 
+		// Load textures
 		spriteSheet = new Texture(Gdx.files.internal("spriteSheet.png"));
 		textureRegions = new TextureRegion[8];
-		for(int i = 0; i < 8; ++i){
-			textureRegions[i] = new TextureRegion(spriteSheet, 64 * i, 0, 64, 64);
+		for(TEXTURE_INDICES textureIndex : TEXTURE_INDICES.values()){
+			textureRegions[textureIndex.ordinal()] = new TextureRegion(spriteSheet, 64 * textureIndex.ordinal(), 0, 64, 64);
 		}
-		batch = new SpriteBatch();
+		spriteBatch = new SpriteBatch();
 
+		// Setup camera
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		camera = new OrthographicCamera(200, 200 * (h / w));
 		camera.position.set(50f, 50f, 0f);
 		camera.update();
 
+		// Setup misc
 		brushSize = 1;
 		isPlaceMode = true;
 		isFoodSelected = true;
-
 		timeScale = 1;
-
 	}
 
 	@Override
@@ -68,23 +84,20 @@ public class AntColonySimulation extends ApplicationAdapter {
 
 		ScreenUtils.clear(0f, 0f, 0f, 1f);
 
-		batch.setProjectionMatrix(camera.combined);
-		batch.begin();
+		spriteBatch.setProjectionMatrix(camera.combined);
+		spriteBatch.begin();
 
 		float deltaTime = Gdx.graphics.getDeltaTime();
 
 		deltaTime *= isPaused ? 0f : timeScale;
 
 		world.update(deltaTime);
-		for(Colony colony : colonies){
-			if(colony != null){
-				colony.update(deltaTime);
-			}
-		}
+		for(Colony colony : colonies)
+			colony.update(deltaTime);
 
-		renderer.render(batch, textureRegions);
+		renderer.render(spriteBatch, textureRegions);
 
-		batch.end();
+		spriteBatch.end();
 
 		}
 
@@ -147,14 +160,14 @@ public class AntColonySimulation extends ApplicationAdapter {
 			}
 		}
 		if(Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)){
-			if(colonyCount < World.MAX_COLONY_COUNT) {
+			if(colonies.size() < World.MAX_COLONY_COUNT) {
 				Vector3 touchPosition = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0f);
 				camera.unproject(touchPosition);
 				Point2D.Float touchPosition2D = new Point2D.Float(touchPosition.x, touchPosition.y);
 
-				colonies[colonyCount] = new Colony(colonyCount, touchPosition2D, world);
-				renderer.addColony(colonies[colonyCount]);
-				++colonyCount;
+				Colony newColony = new Colony(colonies.size(), touchPosition2D, world);
+				colonies.add(newColony);
+				renderer.addColony(newColony);
 			}
 		}
 		if(Gdx.input.isKeyJustPressed(Input.Keys.H)){
@@ -200,7 +213,7 @@ public class AntColonySimulation extends ApplicationAdapter {
 		int heightPixmap = worldImage.getHeight();
 		world = new World(widthPixmap, heightPixmap, 1);
 
-		for(int y=0; y < heightPixmap; y++){
+		for(int y=0; y < heightPixmap; y++)
 			for(int x=0; x < widthPixmap; x++){
 				int colorData = worldImage.getPixel(x, y);
 				int red = colorData >>> 24;
@@ -209,21 +222,19 @@ public class AntColonySimulation extends ApplicationAdapter {
 				int alpha = colorData & 0xFF;
 
 				Color color = new Color(red, green, blue);
-				if(color.equals(WALL_COLOR)){
+				if(color.equals(WALL_COLOR))
 					world.getCell(heightPixmap - 1 - y, x).setWall(true);
-				}else if(color.equals(FOOD_COLOR)){
-					world.getCell(heightPixmap - 1 - y, x).setFoodOnCell(100);
-				}
+				else if(color.equals(FOOD_COLOR))
+					world.getCell(heightPixmap - 1 - y, x).setFoodOnCell(20);
 			}
-		}
-
+		
 		worldImage.dispose();
 	}
-	
+
 	@Override
 	public void dispose () {
 		spriteSheet.dispose();
-		batch.dispose();
+		spriteBatch.dispose();
 	}
 
 }
