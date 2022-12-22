@@ -1,4 +1,9 @@
-## **Simple ant colony simulator with pheromone trails**
+## **Ant colony simulator**
+This simulates how ants work as a hive to find food. Ants place pheromones to tell other ants 
+where they found food or where their base is. Blue dots represent "to colony" pheromones and 
+green ones represent "to food" pheromones. When ants deplete a food source they will lay a
+repellent and degrade any pheromone trails leading to that depleted food source to deter other
+ants from venturing there.
 
 ![](assets/Screenshot.png)
 
